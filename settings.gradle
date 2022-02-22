@@ -1,0 +1,2 @@
+rootProject.name = "Lumos New"
+include ':app'
