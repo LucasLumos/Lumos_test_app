@@ -80,7 +80,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     private static BluetoothGattCharacteristic RalsChar;
     private static BluetoothGattCharacteristic RlightChar;
     private static BluetoothGattCharacteristic RbatteryChar;
-    private static BluetoothGattCharacteristic RlconnectedChar;
+    //private static BluetoothGattCharacteristic RlconnectedChar;
 
     // Tag used for displaying Toast message
     private final static String TAG = MainActivity.class.getSimpleName();
@@ -104,7 +104,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     private boolean LConnectStatus = false;
     private boolean RConnectStatus = false;
 
-    private boolean RLConnectStatus = false;
+    //private boolean RLConnectStatus = false;
 
     // Address of the connected device
     private static String LBluetoothDeviceAddress;
@@ -136,7 +136,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     private byte[] capRValue;
     private byte[] alsRValue;
     private byte[] batteryRValue;
-    private byte[] RLCValue;
+    //private byte[] RLCValue;
 
     private Button btnOn;
     private Button btnGamma;
@@ -265,9 +265,9 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
             // Connect to the device using the address
 
             if (theDevice.getName().equals("PCBPeripheral")){
-                if (RLConnectStatus){
+                //if (RLConnectStatus){
                     LConnectStatus = connectL(theDevice.getAddress());
-                }
+                //}
             }else if (theDevice.getName().equals("LumosRightPCBCentral")){
                 RConnectStatus = connectR(theDevice.getAddress());
             }else {
@@ -624,12 +624,12 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                         RlightChar = characteristic;
                     } else if (deviceUuid.equals(LumosServices.RbatteryCharUUID)){
                         RbatteryChar = characteristic;
-                    }else if (deviceUuid.equals(LumosServices.RLconnectedUUID)){
-                        RlconnectedChar = characteristic;
-                    }
+                    }//else if (deviceUuid.equals(LumosServices.RLconnectedUUID)){
+                    //    RlconnectedChar = characteristic;
+                    //}
                 }
 
-                if (RledChar != null && RbuttonChar != null && RcapChar != null && RalsChar != null && RlightChar != null && RbatteryChar != null && RlconnectedChar != null){
+                if (RledChar != null && RbuttonChar != null && RcapChar != null && RalsChar != null && RlightChar != null && RbatteryChar != null){ // && RlconnectedChar != null
                     Log.d(TAG, "right PCB chars all connected");
 
                     rightPCBConnected = true;
@@ -667,9 +667,9 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
 
             if (charsR.size()==0){
 
-                if(rightPCBConnected){
-                    RBluetoothGatt.readCharacteristic(RlconnectedChar);
-                }
+                //if(rightPCBConnected){
+                //    RBluetoothGatt.readCharacteristic(RlconnectedChar);
+                //}
             }
         }
 
@@ -686,6 +686,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                 Log.d(TAG, String.valueOf(characteristic.getValue()));
 
                 String deviceUuid = characteristic.getUuid().toString();
+                /*
                 if (deviceUuid.equals(LumosServices.RLconnectedUUID)){
                     RLCValue = characteristic.getValue();
                     Log.d(TAG, "RLC has been read on right PCB " + RLCValue[0]);
@@ -695,6 +696,8 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                         RLConnectStatus = false;
                     }
                 }
+                */
+
             }
         }
 
@@ -762,7 +765,9 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                         rbat.setText(voltage / 33 + "%");
                     }
                 });
-            }else if  (deviceUuid.equals(LumosServices.RLconnectedUUID)) {
+            }
+            /*
+            else if  (deviceUuid.equals(LumosServices.RLconnectedUUID)) {
                 RLCValue = characteristic.getValue();
                 Log.d(TAG, "RLC has been changed on right PCB " + RLCValue[0]);
                 if (RLCValue[0] == 1){
@@ -771,7 +776,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                     RLConnectStatus = false;
                 }
             }
-
+            */
             //readChar(characteristic);
         }
 
