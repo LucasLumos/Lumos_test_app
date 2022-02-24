@@ -1,242 +1,371 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    android:background="@color/backgroud_greenBlack">
 
-    <TextView
-        android:id="@+id/textView15"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Left Battery"
-        app:layout_constraintStart_toStartOf="@+id/textView14"
-        app:layout_constraintTop_toBottomOf="@+id/textView14" />
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-    <Button
-        android:id="@+id/resetButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="reset"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:onClick="reset"
-        />
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/light_exposure_top_mark_line"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:visibility="invisible"
+            app:layout_constraintGuide_percent="0.085" />
+
+        <TextView
+            android:id="@+id/light_exposure_text_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/maven_pro_black"
+
+            android:gravity="left"
+            android:text="Welcome!"
+            android:textColor="@color/white"
+
+            android:textSize="37dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/light_exposure_top_mark_line"
+            app:layout_constraintWidth_percent="0.8293" />
+        <TextView
+            android:id="@+id/lcon"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/maven_pro_regular"
+
+            android:gravity="left"
+            android:text="Status: Disconnected"
+            android:textColor="@color/secondary_text_color"
+
+            android:textSize="20dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/light_exposure_text_title"
+            app:layout_constraintWidth_percent="0.8293"
+            android:layout_marginTop="5dp"/>
 
 
-    <Button
-        android:id="@+id/onButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:onClick="onbutton"
-        android:text="ON"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/lcon" />
+        <ScrollView
+            android:id="@+id/light_exposure_scroll_view"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="10dp"
 
-    <Button
-        android:id="@+id/offButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:layout_marginRight="16dp"
-        android:text="OFF"
-        app:layout_constraintBottom_toBottomOf="@+id/onButton"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:onClick="offbutton"
-        />
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/lcon"
+            app:layout_constraintBottom_toBottomOf="parent"
 
-    <Button
-        android:id="@+id/GammaButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="40Hz"
-        app:layout_constraintEnd_toStartOf="@+id/offButton"
-        app:layout_constraintStart_toEndOf="@+id/onButton"
-        app:layout_constraintTop_toTopOf="@+id/onButton"
-        android:onClick="Hzbutton"
-        />
+            app:layout_constraintWidth_percent="0.8293"
+            android:fillViewport="true"
+            android:scrollbars="none"
+            android:overScrollMode="never" >
 
-    <TextView
-        android:id="@+id/lcon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Connecting"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/resetButton" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/lbtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:text="n/a"
-        app:layout_constraintEnd_toStartOf="@+id/GammaButton"
-        app:layout_constraintTop_toBottomOf="@+id/GammaButton" />
 
-    <TextView
-        android:id="@+id/lled"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="n/a"
-        app:layout_constraintEnd_toStartOf="@+id/GammaButton"
-        app:layout_constraintStart_toStartOf="@+id/lbtn"
-        app:layout_constraintTop_toTopOf="@+id/textView3" />
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/light_exposure_battery_status_component"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
 
-    <TextView
-        android:id="@+id/lcap"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="n/a"
-        app:layout_constraintEnd_toStartOf="@+id/GammaButton"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/lled"
-        app:layout_constraintTop_toTopOf="@+id/textView6" />
+                    android:background="@drawable/component_background"
+                    android:padding="24dp">
 
-    <TextView
-        android:id="@+id/textView4"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="24dp"
-        android:text="Left button"
-        app:layout_constraintEnd_toStartOf="@+id/lbtn"
-        app:layout_constraintTop_toTopOf="@+id/lbtn" />
+                    <TextView
+                        android:id="@+id/light_exposure_battery_component_text_title"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
 
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:text="Right button"
-        app:layout_constraintStart_toEndOf="@+id/GammaButton"
-        app:layout_constraintTop_toBottomOf="@+id/GammaButton" />
+                        android:fontFamily="@font/maven_pro_bold"
 
-    <TextView
-        android:id="@+id/rbtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:text="n/a"
-        app:layout_constraintStart_toEndOf="@+id/textView"
-        app:layout_constraintTop_toTopOf="@+id/textView" />
+                        android:lineHeight="21dp"
+                        android:text="Battery"
+                        android:textColor="@color/white"
+                        android:textSize="18dp"
+                        app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/textView3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Left LED"
-        app:layout_constraintStart_toStartOf="@+id/textView4"
-        app:layout_constraintTop_toBottomOf="@+id/textView4" />
+                    <LinearLayout
+                        android:id="@+id/light_exposure_battery_component_left_battery_view"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
 
-    <TextView
-        android:id="@+id/textView6"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Left cap"
-        app:layout_constraintStart_toStartOf="@+id/textView4"
-        app:layout_constraintTop_toBottomOf="@+id/textView3" />
+                        android:layout_marginTop="12dp"
+                        android:gravity="center"
+                        android:orientation="horizontal"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/light_exposure_battery_component_text_title">
 
-    <TextView
-        android:id="@+id/textView5"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Right LED"
-        app:layout_constraintStart_toStartOf="@+id/textView"
-        app:layout_constraintTop_toBottomOf="@+id/textView" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
 
-    <TextView
-        android:id="@+id/textView7"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Right Cap"
-        app:layout_constraintStart_toStartOf="@+id/textView5"
-        app:layout_constraintTop_toBottomOf="@+id/textView5" />
+                            android:fontFamily="@font/maven_pro_regular"
+                            android:text="Left:"
+                            android:textColor="@color/white"
+                            android:textSize="16dp" />
 
-    <TextView
-        android:id="@+id/rled"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="n/a"
-        app:layout_constraintStart_toStartOf="@+id/rbtn"
-        app:layout_constraintTop_toTopOf="@+id/textView5" />
+                        <TextView
+                            android:id="@+id/left_battery_text_power_percentage"
+                            android:layout_width="45dp"
+                            android:layout_height="wrap_content"
 
-    <TextView
-        android:id="@+id/rcap"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="n/a"
-        app:layout_constraintStart_toStartOf="@+id/rled"
-        app:layout_constraintTop_toTopOf="@+id/textView7" />
+                            android:fontFamily="@font/maven_pro_regular"
+                            android:text="0%"
+                            android:textColor="@color/white"
+                            android:textSize="16dp"
+                            android:gravity="right"/>
 
-    <TextView
-        android:id="@+id/rals"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="n/a"
-        app:layout_constraintStart_toStartOf="@+id/rcap"
-        app:layout_constraintTop_toTopOf="@+id/textView12" />
+                    </LinearLayout>
 
-    <TextView
-        android:id="@+id/rbat"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="n/a"
-        app:layout_constraintStart_toStartOf="@+id/rals"
-        app:layout_constraintTop_toTopOf="@+id/textView13" />
+                    <LinearLayout
+                        android:id="@+id/light_exposure_battery_component_right_battery_view"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
 
-    <TextView
-        android:id="@+id/textView12"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Right ALS"
-        app:layout_constraintStart_toStartOf="@+id/textView7"
-        app:layout_constraintTop_toBottomOf="@+id/textView7" />
+                        android:layout_marginTop="12dp"
+                        android:gravity="center"
+                        android:orientation="horizontal"
+                        app:layout_constraintRight_toRightOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/light_exposure_battery_component_text_title"
+                        >
 
-    <TextView
-        android:id="@+id/textView13"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Right battery"
-        app:layout_constraintStart_toStartOf="@+id/textView12"
-        app:layout_constraintTop_toBottomOf="@+id/textView12" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
 
-    <TextView
-        android:id="@+id/textView14"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Left ALS"
-        app:layout_constraintStart_toStartOf="@+id/textView6"
-        app:layout_constraintTop_toBottomOf="@+id/textView6" />
+                            android:text="Right:"
+                            android:fontFamily="@font/maven_pro_regular"
+                            android:textColor="@color/white"
+                            android:textSize="16dp" />
 
-    <TextView
-        android:id="@+id/lals"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="n/a"
-        app:layout_constraintStart_toStartOf="@+id/lcap"
-        app:layout_constraintTop_toTopOf="@+id/textView14" />
+                        <TextView
+                            android:id="@+id/right_battery_text_power_percentage"
+                            android:layout_width="45dp"
+                            android:layout_height="wrap_content"
 
-    <TextView
-        android:id="@+id/lbat"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="n/a"
-        app:layout_constraintStart_toStartOf="@+id/lals"
-        app:layout_constraintTop_toTopOf="@+id/textView15" />
+                            android:fontFamily="@font/maven_pro_regular"
+                            android:text="0%"
+                            android:textColor="@color/white"
+                            android:textSize="16dp"
+                            android:gravity="right"/>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/ALS_title"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+
+                        android:fontFamily="@font/maven_pro_bold"
+
+                        android:lineHeight="21dp"
+                        android:text="ALS"
+                        android:textColor="@color/white"
+                        android:textSize="18dp"
+                        app:layout_constraintTop_toBottomOf="@id/light_exposure_battery_component_right_battery_view"
+                        android:layout_marginTop="16dp"/>
+
+                    <LinearLayout
+                        android:id="@+id/ALS_left"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+
+                        android:layout_marginTop="12dp"
+                        android:gravity="center"
+                        android:orientation="horizontal"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/ALS_title">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+
+                            android:fontFamily="@font/maven_pro_regular"
+                            android:text="Left:"
+                            android:textColor="@color/white"
+                            android:textSize="16dp" />
+
+                        <TextView
+                            android:id="@+id/ALS_left_value"
+                            android:layout_width="40dp"
+                            android:layout_height="wrap_content"
+
+                            android:fontFamily="@font/maven_pro_regular"
+                            android:text="0"
+                            android:textColor="@color/white"
+                            android:textSize="16dp"
+                            android:gravity="right"/>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/ALS_right"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+
+                        android:layout_marginTop="12dp"
+                        android:gravity="center"
+                        android:orientation="horizontal"
+                        app:layout_constraintRight_toRightOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/ALS_title"
+                        >
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+
+                            android:text="Right:"
+                            android:fontFamily="@font/maven_pro_regular"
+                            android:textColor="@color/white"
+                            android:textSize="16dp" />
+
+                        <TextView
+                            android:id="@+id/ALS_right_value"
+                            android:layout_width="40dp"
+                            android:layout_height="wrap_content"
+
+                            android:fontFamily="@font/maven_pro_regular"
+                            android:text="0"
+                            android:textColor="@color/white"
+                            android:textSize="16dp"
+                            android:layout_marginRight="5dp"
+                            android:gravity="right"/>
+
+                    </LinearLayout>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/light_exposure_glasses_control_component"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+
+                    android:background="@drawable/component_background"
+                    android:paddingLeft="16dp"
+                    android:paddingRight="16dp"
+                    android:paddingTop="24dp"
+                    android:paddingBottom="24dp"
+                    android:layout_marginTop="32dp">
+
+                    <TextView
+                        android:id="@+id/session_text_adjust_light"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+
+                        app:layout_constraintTop_toTopOf="parent"
+
+                        android:text="Adjust light intensity"
+                        android:textSize="14dp"
+                        android:textColor="@color/white"
+                        android:fontFamily="@font/maven_pro_bold"
+                        android:lineHeight="17dp"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginRight="8dp"/>
+                    <SeekBar
+                        android:id="@+id/light_control_light_intensity_seekbar"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+
+                        app:layout_constraintTop_toBottomOf="@+id/session_text_adjust_light"
+
+                        android:max="100"
+                        android:progress="50"
+                        android:progressDrawable="@drawable/seekbar_drawable"
+                        android:splitTrack="false"
+                        android:thumb="@drawable/seekbar_thumb"
+                        android:layout_marginTop="8dp"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="8dp"/>
+
+                    <TextView
+                        android:id="@+id/session_text_adjust_light_frequency"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+
+                        app:layout_constraintTop_toBottomOf="@id/light_control_light_intensity_seekbar"
+
+                        android:text="Adjust light frequency"
+                        android:textSize="14dp"
+                        android:textColor="@color/white"
+                        android:fontFamily="@font/maven_pro_bold"
+                        android:lineHeight="17dp"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginRight="8dp"
+                        android:layout_marginTop="15dp"/>
+                    <SeekBar
+                        android:id="@+id/light_control_light_frequency_seekbar"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+
+                        app:layout_constraintTop_toBottomOf="@+id/session_text_adjust_light_frequency"
+
+                        android:max="100"
+                        android:progress="50"
+                        android:progressDrawable="@drawable/seekbar_drawable"
+                        android:splitTrack="false"
+                        android:thumb="@drawable/seekbar_thumb"
+                        android:layout_marginTop="15dp"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="8dp"/>
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        app:layout_constraintWidth_percent="0.4"
+                        android:layout_height="match_parent"
+                        app:layout_constraintTop_toTopOf="@id/reset_btn"
+                        app:layout_constraintBottom_toBottomOf="@id/reset_btn"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintRight_toLeftOf="@id/reset_btn"
+                        android:gravity="center">
+                        <Switch
+
+                            android:text="Off / On"
+                            android:fontFamily="@font/maven_pro_bold"
+                            android:textColor="@color/white"
+                            android:id="@+id/power"
+                            android:checked="true"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+
+                    </LinearLayout>
+
+                    <Button
+                        android:id="@+id/reset_btn"
+                        android:layout_width="0px"
+                        android:layout_height="0px"
+                        app:layout_constraintWidth_percent="0.4"
+                        android:background="@drawable/lightgreen_btn_style"
+
+                        app:layout_constraintTop_toBottomOf="@id/light_control_light_frequency_seekbar"
+                        android:fontFamily="@font/maven_pro_black"
+                        android:text="Reset"
+                        android:textAllCaps="false"
+                        android:textColor="@color/btn_textcolor_switcher"
+                        android:textSize="14dp"
+                        app:layout_constraintDimensionRatio="h,263:80"
+                        android:layout_marginTop="15dp"
+                        app:layout_constraintRight_toRightOf="parent"
+                        android:layout_marginRight="10dp"/>
+
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+            </LinearLayout>
+
+        </ScrollView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+</FrameLayout>

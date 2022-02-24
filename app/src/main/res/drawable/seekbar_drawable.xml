@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@android:id/background"
+        android:gravity="center_vertical|fill_horizontal">
+        <shape
+            android:shape="rectangle"
+            android:tint="@color/seekbar_background">
+            <corners android:radius="5dp" />
+            <size android:height="4dp" />
+            />
+        </shape>
+    </item>
+    <item
+        android:id="@android:id/progress"
+        android:gravity="center_vertical|fill_horizontal">
+        <scale android:scaleWidth="100%">
+            <shape android:shape="rectangle">
+                <corners android:radius="5dp" />
+                <size android:height="4dp" />
+                <solid android:color="@color/button_background_lightGreen_focused" />
+            </shape>
+        </scale>
+    </item>
+</layer-list>

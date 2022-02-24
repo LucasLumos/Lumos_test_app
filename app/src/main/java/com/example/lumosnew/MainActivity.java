@@ -4,6 +4,7 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
@@ -26,6 +27,9 @@ import android.os.ParcelUuid;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.SeekBar;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,7 +37,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements CompoundButton.OnCheckedChangeListener, View.OnClickListener, SeekBar.OnSeekBarChangeListener {
 
     private static final long SCAN_PERIOD = 2000000000;
 
@@ -110,19 +114,16 @@ public class MainActivity extends AppCompatActivity {
     private static BluetoothGatt RBluetoothGatt;
 
 
-    private TextView lcon;
-
-    private TextView lbtn;
-    private TextView lled;
-    private TextView lcap;
     private TextView lals;
     private TextView lbat;
-
-    private TextView rbtn;
-    private TextView rled;
-    private TextView rcap;
     private TextView rals;
     private TextView rbat;
+    private TextView lcon;
+    private Switch light_switch;
+    private SeekBar seekbar_intensity, seekbar_frequency;
+    private Button reset_btn;
+
+
 
     private byte[] LEDLValue;
     private byte[] buttonLValue;
@@ -148,24 +149,19 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        btnOn = (Button)findViewById(R.id.onButton);
-        btnGamma = (Button)findViewById(R.id.GammaButton);
-        btnOff = (Button)findViewById(R.id.offButton);
-        btnReset = (Button)findViewById(R.id.resetButton);
-        disconnected();
         lcon = (TextView) findViewById(R.id.lcon);
 
-        lbtn = (TextView) findViewById(R.id.lbtn);
-        lled = (TextView) findViewById(R.id.lled);
-        lcap = (TextView) findViewById(R.id.lcap);
-        lals = (TextView) findViewById(R.id.lals);
-        lbat = (TextView) findViewById(R.id.lbat);
+        lals = (TextView) findViewById(R.id.ALS_left_value);
+        lbat = (TextView) findViewById(R.id.left_battery_text_power_percentage);
 
-        rbtn = (TextView) findViewById(R.id.rbtn);
-        rled = (TextView) findViewById(R.id.rled);
-        rcap = (TextView) findViewById(R.id.rcap);
-        rals = (TextView) findViewById(R.id.rals);
-        rbat = (TextView) findViewById(R.id.rbat);
+        rals = (TextView) findViewById(R.id.ALS_right_value);
+        rbat = (TextView) findViewById(R.id.right_battery_text_power_percentage);
+        seekbar_intensity = (SeekBar) findViewById(R.id.light_control_light_intensity_seekbar);
+        seekbar_frequency = (SeekBar) findViewById(R.id.light_control_light_frequency_seekbar);
+        light_switch = (Switch) findViewById(R.id.power);
+        reset_btn =(Button) findViewById(R.id.reset_btn);
+
+        disconnected();
 
         // Check if BLE is supported on the device.
         if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
@@ -408,7 +404,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         // Stuff that updates the UI
-                        lcon.setText("connecting");
+                        lcon.setText("Status: Connecting...");
                         disconnected();
                     }
                 });
@@ -455,7 +451,7 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void run() {
                                 // Stuff that updates the UI
-                                lcon.setText("connected");
+                                lcon.setText("Status: Connected");
                                 connectedUI();
                             }
                         });
@@ -512,7 +508,7 @@ public class MainActivity extends AppCompatActivity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            lled.setText(String.valueOf(LEDLValue[0]));
+                            //lled.setText(String.valueOf(LEDLValue[0]));
                         }
                     });
                 }else if  (deviceUuid.equals(LumosServices.buttonCharUUID)) {
@@ -522,7 +518,7 @@ public class MainActivity extends AppCompatActivity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            lbtn.setText(String.valueOf(buttonLValue[0]));
+                            //lbtn.setText(String.valueOf(buttonLValue[0]));
                         }
                     });
                 }else if  (deviceUuid.equals(LumosServices.capCharUUID)) {
@@ -532,7 +528,7 @@ public class MainActivity extends AppCompatActivity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            lcap.setText(String.valueOf(capLValue[0]));
+                            //lcap.setText(String.valueOf(capLValue[0]));
                         }
                     });
                 }else if  (deviceUuid.equals(LumosServices.alsCharUUID)) {
@@ -560,7 +556,7 @@ public class MainActivity extends AppCompatActivity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            lbat.setText(String.valueOf(voltage));
+                            lbat.setText(voltage / 33 + "%");
                         }
                     });
 
@@ -590,7 +586,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         // Stuff that updates the UI
-                        lcon.setText("connecting");
+                        lcon.setText("Status: Connecting...");
                         disconnected();
                     }
                 });
@@ -715,7 +711,7 @@ public class MainActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        rled.setText(String.valueOf(LEDRValue[0]));
+                        //rled.setText(String.valueOf(LEDRValue[0]));
                     }
                 });
             }else if  (deviceUuid.equals(LumosServices.RbuttonCharUUID)) {
@@ -725,7 +721,7 @@ public class MainActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        rbtn.setText(String.valueOf(buttonRValue[0]));
+                        //rbtn.setText(String.valueOf(buttonRValue[0]));
                     }
                 });
             }else if  (deviceUuid.equals(LumosServices.RcapCharUUID)) {
@@ -735,7 +731,7 @@ public class MainActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        rcap.setText(String.valueOf(capRValue[0]));
+                        //rcap.setText(String.valueOf(capRValue[0]));
                     }
                 });
             }else if  (deviceUuid.equals(LumosServices.RalsCharUUID)) {
@@ -763,7 +759,7 @@ public class MainActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        rbat.setText(String.valueOf(voltage));
+                        rbat.setText(voltage / 33 + "%");
                     }
                 });
             }else if  (deviceUuid.equals(LumosServices.RLconnectedUUID)) {
@@ -835,15 +831,26 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void connectedUI() {
-        btnOn.setEnabled(true);
-        btnGamma.setEnabled(true);
-        btnOff.setEnabled(true);
+        light_switch.setChecked(false);
+        seekbar_frequency.setProgress(0);
+        seekbar_intensity.setProgress(0);
+        light_switch.setEnabled(true);
+        seekbar_frequency.setEnabled(true);
+        seekbar_intensity.setEnabled(true);
+        reset_btn.setEnabled(true);
+        reset_btn.setBackground(getDrawable(R.drawable.lightgreen_btn_style));
     }
 
+    @SuppressLint("ResourceAsColor")
     public void disconnected() {
-        btnOn.setEnabled(false);
-        btnGamma.setEnabled(false);
-        btnOff.setEnabled(false);
+        light_switch.setChecked(false);
+        seekbar_frequency.setProgress(0);
+        seekbar_intensity.setProgress(0);
+        light_switch.setEnabled(false);
+        seekbar_frequency.setEnabled(false);
+        seekbar_intensity.setEnabled(false);
+        reset_btn.setEnabled(false);
+        reset_btn.setBackground(getDrawable(R.drawable.btn_disable));
     }
 
     public void reset(View view) {
@@ -1066,6 +1073,31 @@ public class MainActivity extends AppCompatActivity {
         } else {
             Log.i(TAG, "##############################"+"RledChar not written");
         }
+
+    }
+
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+    }
+
+    @Override
+    public void onClick(View v) {
+
+    }
+
+    @Override
+    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+    }
+
+    @Override
+    public void onStartTrackingTouch(SeekBar seekBar) {
+
+    }
+
+    @Override
+    public void onStopTrackingTouch(SeekBar seekBar) {
 
     }
 }

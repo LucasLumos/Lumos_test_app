@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!--     primary colors: -->
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>
     <color name="purple_700">#FF3700B3</color>
@@ -7,4 +7,27 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="red">#FF0000</color>
+    <!--     my colors:    -->
+    <color name="backgroud_greenBlack">#002424</color>
+    <color name="button_background_lightGreen_not_focused">#1AC9C9</color>
+    <color name="button_background_lightGreen_focused">#aa1AC9C9</color>
+    <color name="transparency">#00FFFFFF</color>
+    <color name="border_line">#325555</color>
+    <color name="hint_text_color">#99ADAD</color>
+    <color name="disable_red">#F78585</color>
+    <color name="disable_btn_background">#043E3E</color>
+    <color name="disable_btn_text_color">#002424</color>
+    <color name="secondary_text_color">#99ADAD</color>
+    <color name="not_selected_button_color">#4c325555</color>
+    <color name="dialog_background_color">#212021</color>
+    <color name="dialog_btn_text_color">#0A84FF</color>
+    <color name="dia_line">#a5545458</color>
+    <color name="dark_green">#0A3131</color>
+    <color name="component_background_dark_green">#193232</color>
+    <color name="seekbar_background">#394F4F</color>
+    <color name="white_trans">#14FFFFFF</color>
+    <color name="chart_label">#D1EDED</color>
+    <color name="real_light_exposure_line">#33E6F6</color>
+    <color name="lumos_green_tran">#e81AC9C9</color>
 </resources>
