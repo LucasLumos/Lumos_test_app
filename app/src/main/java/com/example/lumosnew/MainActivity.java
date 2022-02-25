@@ -119,9 +119,13 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     private TextView rals;
     private TextView rbat;
     private TextView lcon;
+    private TextView lcap;
+    private TextView rcap;
     private Switch light_switch;
     private SeekBar seekbar_intensity, seekbar_frequency;
     private Button reset_btn;
+    private int on_off=0;//1 means on 0means off
+
 
 
 
@@ -149,6 +153,9 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        lcap = (TextView) findViewById(R.id.Cap_left_value);
+        rcap = (TextView) findViewById(R.id.Cap_right_value);
+
         lcon = (TextView) findViewById(R.id.lcon);
 
         lals = (TextView) findViewById(R.id.ALS_left_value);
@@ -160,6 +167,10 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         seekbar_frequency = (SeekBar) findViewById(R.id.light_control_light_frequency_seekbar);
         light_switch = (Switch) findViewById(R.id.power);
         reset_btn =(Button) findViewById(R.id.reset_btn);
+        seekbar_intensity.setOnSeekBarChangeListener(this);
+        seekbar_frequency.setOnSeekBarChangeListener(this);
+        reset_btn.setOnClickListener(this);
+        light_switch.setOnCheckedChangeListener(this);
 
         disconnected();
 
@@ -451,6 +462,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                             @Override
                             public void run() {
                                 // Stuff that updates the UI
+                                offbutton();
                                 lcon.setText("Status: Connected");
                                 connectedUI();
                             }
@@ -528,7 +540,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            //lcap.setText(String.valueOf(capLValue[0]));
+                            lcap.setText(String.valueOf(capLValue[0]));
                         }
                     });
                 }else if  (deviceUuid.equals(LumosServices.alsCharUUID)) {
@@ -734,7 +746,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        //rcap.setText(String.valueOf(capRValue[0]));
+                        rcap.setText(String.valueOf(capRValue[0]));
                     }
                 });
             }else if  (deviceUuid.equals(LumosServices.RalsCharUUID)) {
@@ -858,7 +870,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         reset_btn.setBackground(getDrawable(R.drawable.btn_disable));
     }
 
-    public void reset(View view) {
+    public void reset() {
 
         //do resetting here
         if (leftPCBConnected){
@@ -874,221 +886,247 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     }
 
 
-    public void onbutton(View view) {
+    public void onbutton() {
         // Convert int to UInt8 (8-bit byte)
-        byte[] value = {(byte) 100,(byte)200};
-        byte[] value2 =  {1};
+        if(lightChar != null && RlightChar != null && ledChar != null &&RledChar != null) {
+            // Convert int to UInt8 (8-bit byte), first byte is duty, second is frequency in Hz
+            byte[] value = {(byte) (100), (byte) 255};//reverse
+            byte[] value2 = {0};
 
-        // Write value to characteristic on the device to change LED brightness
-        lightChar.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
-        lightChar.setValue(value);
+            Log.i(TAG, "##############################" + "Switch to Noon mode");
+            // Write value to characteristic on the device to change LED brightness
+            lightChar.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
+            lightChar.setValue(value);
 
-        if (LBluetoothGatt.writeCharacteristic(lightChar)){
-            Log.i(TAG, "##############################"+"lightChar written: 0");
-        } else {
-            Log.i(TAG, "##############################"+"lightChar not written");
-        }
+            if (LBluetoothGatt.writeCharacteristic(lightChar)) {
+                Log.i(TAG, "##############################" + "lightChar written: 1");
+            } else {
+                Log.i(TAG, "##############################" + "lightChar not written");
+            }
 
-        // A gap for the previous operation to be finished
-        try {
-            Thread.sleep(150);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+            // A gap for the previous operation to be finished
+            try {
+                Thread.sleep(150);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
 
-        // Write value to characteristic on the right device to change LED brightness
-        RlightChar.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
-        RlightChar.setValue(value);
+            // Write value to characteristic on the right device to change LED brightness
+            RlightChar.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
+            RlightChar.setValue(value);
 
-        if (RBluetoothGatt.writeCharacteristic(RlightChar)){
-            Log.i(TAG, "##############################"+"RlightChar written: 0");
-        } else {
-            Log.i(TAG, "##############################"+"RlightChar not written");
-        }
+            if (RBluetoothGatt.writeCharacteristic(RlightChar)){
+                Log.i(TAG, "##############################"+"RlightChar written: 0");
+            } else {
+                Log.i(TAG, "##############################"+"RlightChar not written");
+            }
 
-        // A gap for the previous operation to be finished
-        try {
-            Thread.sleep(150);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+            // A gap for the previous operation to be finished
+            try {
+                Thread.sleep(150);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
 
-        // Write value to characteristic on the device to turn on LED
-        ledChar.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
-        ledChar.setValue(value2);
+            // Write value to characteristic on the device to turn on LED
+            ledChar.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
+            ledChar.setValue(value2);
 
-        if (LBluetoothGatt.writeCharacteristic(ledChar)){
-            Log.i(TAG, "##############################"+"ledChar written: 1");
-        } else {
-            Log.i(TAG, "##############################"+"ledChar not written");
-        }
+            if (LBluetoothGatt.writeCharacteristic(ledChar)){
+                Log.i(TAG, "##############################"+"ledChar written: 0");
+            } else {
+                Log.i(TAG, "##############################"+"ledChar not written");
+            }
 
-        // A gap for the previous operation to be finished
-        try {
-            Thread.sleep(150);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+            // A gap for the previous operation to be finished
+            try {
+                Thread.sleep(150);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
 
-        // Write value to characteristic on the right device to turn on LED
-        RledChar.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
-        RledChar.setValue(value2);
+            // Write value to characteristic on the right device to turn off LED
+            RledChar.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
+            RledChar.setValue(value2);
 
-        if (RBluetoothGatt.writeCharacteristic(RledChar)){
-            Log.i(TAG, "##############################"+"RledChar written: 1");
-        } else {
-            Log.i(TAG, "##############################"+"RledChar not written");
+            if (RBluetoothGatt.writeCharacteristic(RledChar)){
+                Log.i(TAG, "##############################"+"RledChar written: 0");
+            } else {
+                Log.i(TAG, "##############################"+"RledChar not written");
+            }
         }
 
     }
 
-    public void offbutton(View view) {
+    public void offbutton() {
+        if(lightChar != null && RlightChar != null && ledChar != null &&RledChar != null) {
+            // Convert int to UInt8 (8-bit byte), first byte is duty, second is frequency in Hz
+            byte[] value = {(byte) (100), (byte) 255};//reverse
+            byte[] value2 = {1};
 
-        // Convert int to UInt8 (8-bit byte)
-        byte[] value = {(byte) 100, (byte) 200};
-        byte[] value2 = {0};
+            Log.i(TAG, "##############################" + "Switch to Noon mode");
+            // Write value to characteristic on the device to change LED brightness
+            lightChar.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
+            lightChar.setValue(value);
 
-        Log.i(TAG, "##############################" + "Switch to Noon mode");
-        // Write value to characteristic on the device to change LED brightness
-        lightChar.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
-        lightChar.setValue(value);
+            if (LBluetoothGatt.writeCharacteristic(lightChar)) {
+                Log.i(TAG, "##############################" + "lightChar written: 1");
+            } else {
+                Log.i(TAG, "##############################" + "lightChar not written");
+            }
 
-        if (LBluetoothGatt.writeCharacteristic(lightChar)) {
-            Log.i(TAG, "##############################" + "lightChar written: 1");
-        } else {
-            Log.i(TAG, "##############################" + "lightChar not written");
-        }
+            // A gap for the previous operation to be finished
+            try {
+                Thread.sleep(150);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
 
-        // A gap for the previous operation to be finished
-        try {
-            Thread.sleep(150);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+            // Write value to characteristic on the right device to change LED brightness
+            RlightChar.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
+            RlightChar.setValue(value);
 
-        // Write value to characteristic on the right device to change LED brightness
-        RlightChar.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
-        RlightChar.setValue(value);
+            if (RBluetoothGatt.writeCharacteristic(RlightChar)){
+                Log.i(TAG, "##############################"+"RlightChar written: 0");
+            } else {
+                Log.i(TAG, "##############################"+"RlightChar not written");
+            }
 
-        if (RBluetoothGatt.writeCharacteristic(RlightChar)){
-            Log.i(TAG, "##############################"+"RlightChar written: 0");
-        } else {
-            Log.i(TAG, "##############################"+"RlightChar not written");
-        }
+            // A gap for the previous operation to be finished
+            try {
+                Thread.sleep(150);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
 
-        // A gap for the previous operation to be finished
-        try {
-            Thread.sleep(150);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+            // Write value to characteristic on the device to turn on LED
+            ledChar.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
+            ledChar.setValue(value2);
 
-        // Write value to characteristic on the device to turn on LED
-        ledChar.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
-        ledChar.setValue(value2);
+            if (LBluetoothGatt.writeCharacteristic(ledChar)){
+                Log.i(TAG, "##############################"+"ledChar written: 0");
+            } else {
+                Log.i(TAG, "##############################"+"ledChar not written");
+            }
 
-        if (LBluetoothGatt.writeCharacteristic(ledChar)){
-            Log.i(TAG, "##############################"+"ledChar written: 0");
-        } else {
-            Log.i(TAG, "##############################"+"ledChar not written");
-        }
+            // A gap for the previous operation to be finished
+            try {
+                Thread.sleep(150);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
 
-        // A gap for the previous operation to be finished
-        try {
-            Thread.sleep(150);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+            // Write value to characteristic on the right device to turn off LED
+            RledChar.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
+            RledChar.setValue(value2);
 
-        // Write value to characteristic on the right device to turn off LED
-        RledChar.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
-        RledChar.setValue(value2);
-
-        if (RBluetoothGatt.writeCharacteristic(RledChar)){
-            Log.i(TAG, "##############################"+"RledChar written: 0");
-        } else {
-            Log.i(TAG, "##############################"+"RledChar not written");
+            if (RBluetoothGatt.writeCharacteristic(RledChar)){
+                Log.i(TAG, "##############################"+"RledChar written: 0");
+            } else {
+                Log.i(TAG, "##############################"+"RledChar not written");
+            }
         }
     }
 
-    public void Hzbutton(View view) {
+    public void Set_Hz_duty(int duty,int frequency) {
+        if(lightChar != null && RlightChar != null && ledChar != null &&RledChar != null) {
+            // Convert int to UInt8 (8-bit byte), first byte is duty, second is frequency in Hz
+            byte[] value = {(byte) (101-duty), (byte) frequency};//reverse
+            byte[] value2 = {1};
 
-        // Convert int to UInt8 (8-bit byte), first byte is duty, second is frequency in Hz
-        byte[] value = {(byte) 50, (byte) 40};
-        byte[] value2 = {1};
+            Log.i(TAG, "##############################" + "Switch to Noon mode");
+            // Write value to characteristic on the device to change LED brightness
+            lightChar.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
+            lightChar.setValue(value);
 
-        Log.i(TAG, "##############################" + "Switch to Noon mode");
-        // Write value to characteristic on the device to change LED brightness
-        lightChar.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
-        lightChar.setValue(value);
+            if (LBluetoothGatt.writeCharacteristic(lightChar)) {
+                Log.i(TAG, "##############################" + "lightChar written: 1");
+            } else {
+                Log.i(TAG, "##############################" + "lightChar not written");
+            }
 
-        if (LBluetoothGatt.writeCharacteristic(lightChar)) {
-            Log.i(TAG, "##############################" + "lightChar written: 1");
-        } else {
-            Log.i(TAG, "##############################" + "lightChar not written");
+            // A gap for the previous operation to be finished
+            try {
+                Thread.sleep(150);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            // Write value to characteristic on the right device to change LED brightness
+            RlightChar.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
+            RlightChar.setValue(value);
+
+            if (RBluetoothGatt.writeCharacteristic(RlightChar)){
+                Log.i(TAG, "##############################"+"RlightChar written: 0");
+            } else {
+                Log.i(TAG, "##############################"+"RlightChar not written");
+            }
+
+            // A gap for the previous operation to be finished
+            try {
+                Thread.sleep(150);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            // Write value to characteristic on the device to turn on LED
+            ledChar.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
+            ledChar.setValue(value2);
+
+            if (LBluetoothGatt.writeCharacteristic(ledChar)){
+                Log.i(TAG, "##############################"+"ledChar written: 0");
+            } else {
+                Log.i(TAG, "##############################"+"ledChar not written");
+            }
+
+            // A gap for the previous operation to be finished
+            try {
+                Thread.sleep(150);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            // Write value to characteristic on the right device to turn off LED
+            RledChar.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
+            RledChar.setValue(value2);
+
+            if (RBluetoothGatt.writeCharacteristic(RledChar)){
+                Log.i(TAG, "##############################"+"RledChar written: 0");
+            } else {
+                Log.i(TAG, "##############################"+"RledChar not written");
+            }
         }
-
-        // A gap for the previous operation to be finished
-        try {
-            Thread.sleep(150);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        // Write value to characteristic on the right device to change LED brightness
-        RlightChar.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
-        RlightChar.setValue(value);
-
-        if (RBluetoothGatt.writeCharacteristic(RlightChar)){
-            Log.i(TAG, "##############################"+"RlightChar written: 0");
-        } else {
-            Log.i(TAG, "##############################"+"RlightChar not written");
-        }
-
-        // A gap for the previous operation to be finished
-        try {
-            Thread.sleep(150);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        // Write value to characteristic on the device to turn on LED
-        ledChar.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
-        ledChar.setValue(value2);
-
-        if (LBluetoothGatt.writeCharacteristic(ledChar)){
-            Log.i(TAG, "##############################"+"ledChar written: 0");
-        } else {
-            Log.i(TAG, "##############################"+"ledChar not written");
-        }
-
-        // A gap for the previous operation to be finished
-        try {
-            Thread.sleep(150);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        // Write value to characteristic on the right device to turn off LED
-        RledChar.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
-        RledChar.setValue(value2);
-
-        if (RBluetoothGatt.writeCharacteristic(RledChar)){
-            Log.i(TAG, "##############################"+"RledChar written: 0");
-        } else {
-            Log.i(TAG, "##############################"+"RledChar not written");
-        }
-
     }
 
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-
+        switch (buttonView.getId()){
+            case R.id.power:
+                if(isChecked){
+                    Log.i("felix","switch on");
+                    onbutton();
+                    Set_Hz_duty(seekbar_intensity.getProgress(),seekbar_frequency.getProgress());
+                    on_off = 1;
+                }else{
+                    Log.i("felix","switch off");
+                    offbutton();
+                    on_off = 0;
+                }
+                break;
+            default:
+                break;
+        }
     }
 
     @Override
     public void onClick(View v) {
-
+        switch (v.getId()){
+            case R.id.reset_btn:
+                reset();
+                break;
+            default:
+                break;
+        }
     }
 
     @Override
@@ -1103,6 +1141,10 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
 
     @Override
     public void onStopTrackingTouch(SeekBar seekBar) {
-
+        if(on_off == 1){
+            Set_Hz_duty(seekbar_intensity.getProgress(),seekbar_frequency.getProgress());
+        }
+        Log.i("felix","frequency progress :"+seekbar_frequency.getProgress());
+        Log.i("felix","intensity progress :"+seekbar_intensity.getProgress());
     }
 }
