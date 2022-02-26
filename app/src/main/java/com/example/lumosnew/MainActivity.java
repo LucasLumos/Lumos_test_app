@@ -1039,6 +1039,9 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
             byte[] value = {(byte) (duty), (byte) frequency};//reverse
             byte[] value2 = {1};
 
+            intensityLabel.setText(String.valueOf(duty));
+            frequencyLabel.setText(String.valueOf(frequency));
+
             Log.i(TAG, "##############################" + "Switch to Noon mode");
             // Write value to characteristic on the device to change LED brightness
             lightChar.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
