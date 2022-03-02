@@ -28,6 +28,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -125,6 +126,8 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     private SeekBar seekbar_intensity, seekbar_frequency;
     private Button reset_btn;
     private int on_off=0;//1 means on 0means off
+    private ImageButton intensity_right,intensity_left,frequency_right,frequency_left;
+    private TextView intensity_seek_text,frequency_seek_text;
 
 
 
@@ -171,6 +174,18 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         seekbar_frequency.setOnSeekBarChangeListener(this);
         reset_btn.setOnClickListener(this);
         light_switch.setOnCheckedChangeListener(this);
+        intensity_seek_text = findViewById(R.id.intensity_text);
+        frequency_seek_text = findViewById(R.id.frequency_text);
+
+        intensity_right = findViewById(R.id.right_arrow_intensity);
+        intensity_left= findViewById(R.id.left_arrow_intensity);
+        frequency_right= findViewById(R.id.right_arrow_frequency);
+        frequency_left= findViewById(R.id.left_arrow_frequency);
+        intensity_right.setOnClickListener(this);
+        intensity_left.setOnClickListener(this);
+        frequency_right.setOnClickListener(this);
+        frequency_left.setOnClickListener(this);
+
 
         disconnected();
 
@@ -856,6 +871,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         seekbar_intensity.setEnabled(true);
         reset_btn.setEnabled(true);
         reset_btn.setBackground(getDrawable(R.drawable.lightgreen_btn_style));
+        offbutton();
     }
 
     @SuppressLint("ResourceAsColor")
@@ -1124,6 +1140,19 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
             case R.id.reset_btn:
                 reset();
                 break;
+            case R.id.left_arrow_intensity:
+                Log.i("felix","clicked");
+                seekbar_intensity.setProgress(seekbar_intensity.getProgress()-1);
+                break;
+            case R.id.right_arrow_intensity:
+                seekbar_intensity.setProgress(seekbar_intensity.getProgress()+1);
+                break;
+            case R.id.left_arrow_frequency:
+                seekbar_frequency.setProgress(seekbar_frequency.getProgress()-1);
+                break;
+            case R.id.right_arrow_frequency:
+                seekbar_frequency.setProgress(seekbar_frequency.getProgress()+1);
+                break;
             default:
                 break;
         }
@@ -1131,7 +1160,16 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
 
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-
+        switch (seekBar.getId()){
+            case R.id.light_control_light_intensity_seekbar:
+                intensity_seek_text.setText(progress+"%");
+                break;
+            case R.id.light_control_light_frequency_seekbar:
+                frequency_seek_text.setText(progress+"");
+                break;
+            default:
+                break;
+        }
     }
 
     @Override

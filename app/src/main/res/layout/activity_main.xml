@@ -358,7 +358,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
 
-                        android:layout_marginTop="8dp"
+                        android:layout_marginTop="15dp"
 
                         android:max="100"
                         android:min="0"
@@ -370,6 +370,56 @@
                         android:thumb="@drawable/seekbar_thumb"
                         app:layout_constraintTop_toBottomOf="@+id/session_text_adjust_light" />
 
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/duty_info"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        app:layout_constraintDimensionRatio="h,263:30"
+                        app:layout_constraintTop_toBottomOf="@id/light_control_light_intensity_seekbar"
+                        android:layout_marginTop="10dp">
+                        <TextView
+                            android:id="@+id/intensity_text"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/maven_pro_bold"
+                            android:text="0%"
+                            android:textColor="@color/white"
+                            android:textSize="20dp"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintLeft_toLeftOf="parent"
+                            android:layout_marginLeft="10dp"/>
+
+                        <ImageButton
+                            android:id="@+id/right_arrow_intensity"
+                            android:clickable="true"
+                            android:layout_width="0dp"
+                            android:layout_height="0dp"
+                            app:layout_constraintDimensionRatio="h,1:2"
+                            app:layout_constraintHeight_percent="0.6"
+                            android:src="@drawable/right_arrow"
+                            android:scaleType="centerInside"
+                            android:background="@color/transparency"
+                            app:tint="@color/button_background_lightGreen_not_focused"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintRight_toRightOf="parent"/>
+
+                        <ImageButton
+                            android:id="@+id/left_arrow_intensity"
+                            android:clickable="true"
+                            android:layout_width="0dp"
+                            android:layout_height="0dp"
+                            app:layout_constraintDimensionRatio="h,1:2"
+                            app:layout_constraintHeight_percent="0.6"
+                            android:src="@drawable/left_arrow"
+                            android:scaleType="centerInside"
+                            android:background="@color/transparency"
+                            app:tint="@color/button_background_lightGreen_not_focused"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintRight_toLeftOf="@id/right_arrow_intensity"/>
+                    </androidx.constraintlayout.widget.ConstraintLayout>
                     <TextView
                         android:id="@+id/session_text_adjust_light_frequency"
                         android:layout_width="match_parent"
@@ -384,7 +434,7 @@
                         android:text="Adjust light frequency"
                         android:textColor="@color/white"
                         android:textSize="14dp"
-                        app:layout_constraintTop_toBottomOf="@id/light_control_light_intensity_seekbar" />
+                        app:layout_constraintTop_toBottomOf="@id/duty_info" />
 
                     <SeekBar
                         android:id="@+id/light_control_light_frequency_seekbar"
@@ -402,6 +452,57 @@
                         android:splitTrack="false"
                         android:thumb="@drawable/seekbar_thumb"
                         app:layout_constraintTop_toBottomOf="@+id/session_text_adjust_light_frequency" />
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/frequency_info"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        app:layout_constraintDimensionRatio="h,263:30"
+                        app:layout_constraintTop_toBottomOf="@id/light_control_light_frequency_seekbar"
+                        android:layout_marginTop="10dp">
+                        <TextView
+                            android:id="@+id/frequency_text"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/maven_pro_bold"
+                            android:text="0"
+                            android:textColor="@color/white"
+                            android:textSize="20dp"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintLeft_toLeftOf="parent"
+                            android:layout_marginLeft="10dp"/>
+
+                        <ImageButton
+                            android:id="@+id/right_arrow_frequency"
+                            android:clickable="true"
+                            android:layout_width="0dp"
+                            android:layout_height="0dp"
+                            app:layout_constraintDimensionRatio="h,1:2"
+                            app:layout_constraintHeight_percent="0.6"
+                            android:src="@drawable/right_arrow"
+                            android:scaleType="centerInside"
+                            android:background="@color/transparency"
+                            app:tint="@color/button_background_lightGreen_not_focused"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintRight_toRightOf="parent"/>
+
+                        <ImageButton
+                            android:id="@+id/left_arrow_frequency"
+                            android:clickable="true"
+                            android:layout_width="0dp"
+                            android:layout_height="0dp"
+                            app:layout_constraintDimensionRatio="h,1:2"
+                            app:layout_constraintHeight_percent="0.6"
+                            android:src="@drawable/left_arrow"
+                            android:scaleType="centerInside"
+                            android:background="@color/transparency"
+                            app:tint="@color/button_background_lightGreen_not_focused"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintRight_toLeftOf="@id/right_arrow_frequency"/>
+                    </androidx.constraintlayout.widget.ConstraintLayout>
 
                     <LinearLayout
                         android:layout_width="0dp"
@@ -440,7 +541,7 @@
                         android:textSize="14dp"
                         app:layout_constraintDimensionRatio="h,263:80"
                         app:layout_constraintRight_toRightOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/light_control_light_frequency_seekbar"
+                        app:layout_constraintTop_toBottomOf="@id/frequency_info"
                         app:layout_constraintWidth_percent="0.4" />
 
 
