@@ -19,6 +19,7 @@ import android.bluetooth.le.ScanFilter;
 import android.bluetooth.le.ScanResult;
 import android.bluetooth.le.ScanSettings;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -211,7 +212,11 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         }
 
         // Obtain bluetooth adapter and scanner.
-        getBluetoothAdapterAndLeScanner();
+        try {
+            getBluetoothAdapterAndLeScanner();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
         // Checks if Bluetooth is supported on the device.
         if (mBluetoothAdapter == null) {
@@ -226,6 +231,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         scanLeDevice(true);
 
     }
+
 
 
     // Start to scan devices nearby and then call the "connect" method
@@ -857,14 +863,25 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     for later use.
      */
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    private void getBluetoothAdapterAndLeScanner(){
+    private void getBluetoothAdapterAndLeScanner() throws InterruptedException {
         // Get BluetoothAdapter and BluetoothLeScanner.
         final BluetoothManager bluetoothManager =
                 (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
         mBluetoothAdapter = bluetoothManager.getAdapter();
+        if (mBluetoothAdapter == null) {
+            // Device does not support Bluetooth
+        } else if (!mBluetoothAdapter.isEnabled()) {
+            while(!mBluetoothAdapter.isEnabled()){
+                mBluetoothAdapter.enable();
+                if(!mBluetoothAdapter.isEnabled()){
+                    Thread.sleep(3000);
+                }
+            }
+        }
         mBluetoothLeScanner = mBluetoothAdapter.getBluetoothLeScanner();
 
         mScanning = false;
+
     }
 
     public void connectedUI() {
@@ -877,6 +894,10 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         reset_btn.setEnabled(true);
         reset_btn.setBackground(getDrawable(R.drawable.lightgreen_btn_style));
         offbutton();
+        intensity_right.setEnabled(true);
+        intensity_left.setEnabled(true);
+        frequency_right.setEnabled(true);
+        frequency_left.setEnabled(true);
     }
 
     @SuppressLint("ResourceAsColor")
@@ -889,6 +910,10 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         seekbar_intensity.setEnabled(false);
         reset_btn.setEnabled(false);
         reset_btn.setBackground(getDrawable(R.drawable.btn_disable));
+        intensity_right.setEnabled(false);
+        intensity_left.setEnabled(false);
+        frequency_right.setEnabled(false);
+        frequency_left.setEnabled(false);
     }
 
     public void reset() {
