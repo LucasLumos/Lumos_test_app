@@ -123,8 +123,6 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     private TextView lcon;
     private TextView lcap;
     private TextView rcap;
-    private TextView intensityLabel;
-    private TextView frequencyLabel;
     private Switch light_switch;
     private SeekBar seekbar_intensity, seekbar_frequency;
     private Button reset_btn;
@@ -166,9 +164,6 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
 
         lals = (TextView) findViewById(R.id.ALS_left_value);
         lbat = (TextView) findViewById(R.id.left_battery_text_power_percentage);
-
-        intensityLabel = (TextView) findViewById(R.id.intensity_label);
-        frequencyLabel = (TextView) findViewById(R.id.frequency_label);
 
         rals = (TextView) findViewById(R.id.ALS_right_value);
         rbat = (TextView) findViewById(R.id.right_battery_text_power_percentage);
@@ -1079,9 +1074,6 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
             // Convert int to UInt8 (8-bit byte), first byte is duty, second is frequency in Hz
             byte[] value = {(byte) (duty), (byte) frequency};//reverse
             byte[] value2 = {1};
-
-            intensityLabel.setText(String.valueOf(duty));
-            frequencyLabel.setText(String.valueOf(frequency));
 
             Log.i(TAG, "##############################" + "Switch to Noon mode");
             // Write value to characteristic on the device to change LED brightness
