@@ -27,9 +27,11 @@ import android.os.Handler;
 import android.os.ParcelUuid;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ImageButton;
+import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -120,7 +122,6 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     private TextView lbat;
     private TextView rals;
     private TextView rbat;
-    private TextView lcon;
     private TextView lcap;
     private TextView rcap;
     private Switch light_switch;
@@ -129,6 +130,15 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     private int on_off=0;//1 means on 0means off
     private ImageButton intensity_right,intensity_left,frequency_right,frequency_left;
     private TextView intensity_seek_text,frequency_seek_text;
+    private ListView leftListview,rightListview;
+    private TextView leftState,rightState;
+
+    private ArrayList<String> leftItems=new ArrayList<String>();
+    private ArrayList<String> rightItems=new ArrayList<String>();
+
+    private ArrayAdapter<String> leftAdaptor;
+    private ArrayAdapter<String> rightAdaptor;
+
 
 
 
@@ -160,8 +170,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         lcap = (TextView) findViewById(R.id.Cap_left_value);
         rcap = (TextView) findViewById(R.id.Cap_right_value);
 
-        lcon = (TextView) findViewById(R.id.lcon);
-
+//        lcon = (TextView) findViewById(R.id.lcon);
         lals = (TextView) findViewById(R.id.ALS_left_value);
         lbat = (TextView) findViewById(R.id.left_battery_text_power_percentage);
 
@@ -178,6 +187,11 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         intensity_seek_text = findViewById(R.id.intensity_text);
         frequency_seek_text = findViewById(R.id.frequency_text);
 
+        leftListview = findViewById(R.id.left_list);
+        rightListview = findViewById(R.id.right_list );
+        leftState = findViewById(R.id.light_exposure_status_left_state );
+        rightState = findViewById(R.id.light_exposure_status_right_state );
+
         intensity_right = findViewById(R.id.right_arrow_intensity);
         intensity_left= findViewById(R.id.left_arrow_intensity);
         frequency_right= findViewById(R.id.right_arrow_frequency);
@@ -186,6 +200,23 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         intensity_left.setOnClickListener(this);
         frequency_right.setOnClickListener(this);
         frequency_left.setOnClickListener(this);
+
+        leftAdaptor = new ArrayAdapter<>(
+                MainActivity.this,
+                R.layout.list_item_style,
+                leftItems
+        );
+
+        leftListview.setAdapter(leftAdaptor);
+
+        rightAdaptor = new ArrayAdapter<>(
+                MainActivity.this,
+                R.layout.list_item_style,
+                rightItems
+        );
+
+        rightListview.setAdapter(rightAdaptor);
+
 
 
         disconnected();
@@ -267,6 +298,8 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                     new ScanSettings.Builder().build();
 
             // Start to scan devices
+            setLeftState("scanning");
+            setRightState("scanning");
             mBluetoothLeScanner.startScan(scanFilters, scanSettings, scanCallback);
 
             mScanning = true;
@@ -297,10 +330,10 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
             // Connect to the device using the address
 
             if (theDevice.getName().equals("PCBPeripheral")){
-                //if (RLConnectStatus){
-                    LConnectStatus = connectL(theDevice.getAddress());
-                //}
+                setLeftState("connecting");
+                LConnectStatus = connectL(theDevice.getAddress());
             }else if (theDevice.getName().equals("LumosRightPCBCentral")){
+                setRightState("connecting");
                 RConnectStatus = connectR(theDevice.getAddress());
             }else {
                 Log.d(TAG, "not connecting but!!!!!!!1" + Dname);
@@ -332,11 +365,13 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     public boolean connectL(final String address) {
         if (address == null) {
             Log.w(TAG, "Unspecified address.");
+            setLeftState("disconnected");
             return false;
         }
 
         if (mBluetoothAdapter == null) {
             Log.w(TAG, "BluetoothAdapter not initialized.");
+            setLeftState("disconnected");
             return false;
         }
 
@@ -348,6 +383,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                 LConnectionState = STATE_CONNECTING;
                 return true;
             } else {
+                setLeftState("disconnected");
                 return false;
             }
         }
@@ -356,6 +392,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         final BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
         if (device == null) {
             Log.w(TAG, "Device not found. Unable to connect.");
+            setLeftState("disconnected");
             return false;
         }
 
@@ -374,11 +411,13 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     public boolean connectR(final String address) {
         if (address == null) {
             Log.w(TAG, "Unspecified address.");
+            setRightState("disconnected");
             return false;
         }
 
         if (mBluetoothAdapter == null) {
             Log.w(TAG, "BluetoothAdapter not initialized.");
+            setRightState("disconnected");
             return false;
         }
 
@@ -390,6 +429,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                 LConnectionState = STATE_CONNECTING;
                 return true;
             } else {
+                setRightState("disconnected");
                 return false;
             }
         }
@@ -398,6 +438,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         final BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
         if (device == null) {
             Log.w(TAG, "Device not found. Unable to connect.");
+            setRightState("disconnected");
             return false;
         }
 
@@ -407,7 +448,6 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
 
         LBluetoothDeviceAddress = address;
         LConnectionState = STATE_CONNECTING;
-
         return true;
     }
 
@@ -421,12 +461,14 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
             Log.d(TAG, "connection with device " + gatt.getDevice().getName());
             if (newState == BluetoothProfile.STATE_CONNECTED) {
+                setLeftState("connected");
                 LConnectionState = STATE_CONNECTED;
                 Log.i(TAG, "Connected to GATT server for left.");
                 // Discover the services of the current blue tooth gatt
                 Log.i(TAG, "Attempting to start service discovery:" +
                         LBluetoothGatt.discoverServices());
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
+                setLeftState("disconnected");
                 LConnectionState = STATE_DISCONNECTED;
                 leftPCBConnected = false;
                 // Prints True or False
@@ -436,7 +478,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                     @Override
                     public void run() {
                         // Stuff that updates the UI
-                        lcon.setText("Status: Connecting...");
+//                        lcon.setText("Status: Connecting...");
                         disconnected();
                     }
                 });
@@ -460,21 +502,26 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                     String deviceUuid = characteristic.getUuid().toString();
                     if (deviceUuid.equals(LumosServices.buttonCharUUID)){
                         buttonChar = characteristic;
+                        addLeftList("buttonChar");
                     } else if (deviceUuid.equals(LumosServices.capCharUUID)){
                         capChar = characteristic;
+                        addLeftList("capChar");
                     } else if (deviceUuid.equals(LumosServices.ledCharUUID)){
                         ledChar = characteristic;
+                        addLeftList("ledChar");
                     } else if (deviceUuid.equals(LumosServices.alsCharUUID)){
                         alsChar = characteristic;
+                        addLeftList("alsChar");
                     } else if (deviceUuid.equals(LumosServices.lightCharUUID)){
                         lightChar = characteristic;
+                        addLeftList("lightChar");
                     } else if (deviceUuid.equals(LumosServices.batteryCharUUID)){
                         batteryChar = characteristic;
+                        addLeftList("batteryChar");
+                    }else{
+                        addLeftList(deviceUuid);
                     }
                 }
-
-                if (ledChar != null && buttonChar != null && capChar != null && alsChar != null && lightChar != null && batteryChar != null){
-                    Log.d(TAG, "left PCB chars all connected");
 
                     leftPCBConnected = true;
 
@@ -484,13 +531,11 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                             public void run() {
                                 // Stuff that updates the UI
                                 offbutton();
-                                lcon.setText("Status: Connected");
+//                                lcon.setText("Status: Connected");
                                 connectedUI();
                             }
                         });
                     }
-
-                }
 
                 for (BluetoothGattCharacteristic characteristic: LBluetoothGatt.getService(UUID.fromString("56f59bd1-dc9e-4447-9ba5-88d3c27c6281")).getCharacteristics()) {
                     chars.add(characteristic);
@@ -606,12 +651,14 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
             Log.d(TAG, "connection with right device " + gatt.getDevice().getName());
             if (newState == BluetoothProfile.STATE_CONNECTED) {
+                setRightState("connected");
                 RConnectionState = STATE_CONNECTED;
                 Log.i(TAG, "Connected to GATT server for right.");
                 // Discover the services of the current blue tooth gatt
                 Log.i(TAG, "Attempting to start service discovery for right side:" +
                         RBluetoothGatt.discoverServices());
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
+                setRightState("disconnected");
                 RConnectionState = STATE_DISCONNECTED;
                 rightPCBConnected = false;
 
@@ -619,7 +666,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                     @Override
                     public void run() {
                         // Stuff that updates the UI
-                        lcon.setText("Status: Connecting...");
+//                        lcon.setText("Status: Connecting...");
                         disconnected();
                     }
                 });
@@ -646,23 +693,29 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                 for (BluetoothGattCharacteristic characteristic : characteristics){
                     String deviceUuid = characteristic.getUuid().toString();
                     if (deviceUuid.equals(LumosServices.RbuttonCharUUID)){
+                        addRightList("RbuttonChar");
                         RbuttonChar = characteristic;
                     } else if (deviceUuid.equals(LumosServices.RcapCharUUID)){
+                        addRightList("RcapChar");
                         RcapChar = characteristic;
                     } else if (deviceUuid.equals(LumosServices.RledCharUUID)){
+                        addRightList("RledChar");
                         RledChar = characteristic;
                     } else if (deviceUuid.equals(LumosServices.RalsCharUUID)){
+                        addRightList("RalsChar");
                         RalsChar = characteristic;
                     } else if (deviceUuid.equals(LumosServices.RlightCharUUID)){
+                        addRightList("RlightChar");
                         RlightChar = characteristic;
                     } else if (deviceUuid.equals(LumosServices.RbatteryCharUUID)){
+                        addRightList("RbatteryChar");
                         RbatteryChar = characteristic;
-                    }//else if (deviceUuid.equals(LumosServices.RLconnectedUUID)){
-                    //    RlconnectedChar = characteristic;
-                    //}
+                    }else{
+                        addRightList(deviceUuid);
+                    }
                 }
 
-                if (RledChar != null && RbuttonChar != null && RcapChar != null && RalsChar != null && RlightChar != null && RbatteryChar != null){ // && RlconnectedChar != null
+
                     Log.d(TAG, "right PCB chars all connected");
 
                     rightPCBConnected = true;
@@ -672,13 +725,11 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                             @Override
                             public void run() {
                                 // Stuff that updates the UI
-                                lcon.setText("connected");
+//                                lcon.setText("connected");
                                 connectedUI();
                             }
                         });
                     }
-
-                }
 
                 for (BluetoothGattCharacteristic characteristic: RBluetoothGatt.getService(UUID.fromString("9ab00bd6-1ab9-4912-abc6-f1d44a0dd7a4")).getCharacteristics()) {
                     charsR.add(characteristic);
@@ -1181,6 +1232,45 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
             default:
                 break;
         }
+    }
+
+    private void addLeftList(String item){
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                leftItems.add(item);
+                leftAdaptor.notifyDataSetChanged();
+            }
+        });
+    }
+
+    private void addRightList(String item){
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                rightItems.add(item);
+                rightAdaptor.notifyDataSetChanged();
+            }
+        });
+
+    }
+
+    private void setLeftState(String text){
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                leftState.setText(text);
+            }
+        });
+    }
+
+    private void setRightState(String text){
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                rightState.setText(text);
+            }
+        });
     }
 
     @Override
