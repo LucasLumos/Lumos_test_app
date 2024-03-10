@@ -600,6 +600,24 @@
                             app:layout_constraintRight_toLeftOf="@id/right_arrow_frequency"/>
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
+                    <Button
+                        android:id="@+id/pvtbtn"
+                        android:layout_width="0px"
+                        android:layout_height="0px"
+                        android:layout_marginTop="15dp"
+                        android:layout_marginRight="10dp"
+
+                        android:background="@drawable/lightgreen_btn_style"
+                        android:fontFamily="@font/maven_pro_black"
+                        android:text="Start PVT game"
+                        android:textAllCaps="false"
+                        android:textColor="@color/btn_textcolor_switcher"
+                        android:textSize="14dp"
+                        app:layout_constraintDimensionRatio="h,263:30"
+                        app:layout_constraintTop_toBottomOf="@id/frequency_info"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintWidth_percent="1" />
+
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
@@ -637,7 +655,7 @@
                         android:textSize="14dp"
                         app:layout_constraintDimensionRatio="h,263:80"
                         app:layout_constraintRight_toRightOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/frequency_info"
+                        app:layout_constraintTop_toBottomOf="@id/pvtbtn"
                         app:layout_constraintWidth_percent="0.4" />
 
 

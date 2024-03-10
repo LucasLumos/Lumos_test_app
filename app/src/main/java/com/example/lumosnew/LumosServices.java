@@ -38,6 +38,9 @@ public class LumosServices {
     public static String RalsCharUUID = "0788570d-0116-4cfc-9342-e5d016cfdb59";
     public static String RlightCharUUID = "3f5a21ed-83df-4e71-9507-a043114c95db";
     public static String RbatteryCharUUID = "f38f1739-f2e8-447c-a0fe-72d293cfdbee";
+
+    public static String pvtCharUUID = "03F2E1D0-CFCF-BEAD-9C8B-7A6F5E4D3C2B1A";
+
     public static String RLconnectedUUID = "13264462-3995-11eb-adc1-0242ac120002";
 
     // Add all characteristics to the hash map for later searching purpose

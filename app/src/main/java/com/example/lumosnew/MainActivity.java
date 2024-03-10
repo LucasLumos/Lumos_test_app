@@ -77,6 +77,8 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     private static BluetoothGattCharacteristic lightChar;
     private static BluetoothGattCharacteristic batteryChar;
 
+    private static BluetoothGattCharacteristic pvtChar;
+
     //7 characteristics in the right device
     private static BluetoothGattCharacteristic RbuttonChar;
     private static BluetoothGattCharacteristic RcapChar;
@@ -161,6 +163,13 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     private Button btnOff;
     private Button btnReset;
 
+    private Button pvtBtn;
+
+    private byte[] pvtResult = new byte[3];
+    private boolean wait4PVTResult = false;
+
+    private int currentResult = 0;
+
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -196,10 +205,12 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         intensity_left= findViewById(R.id.left_arrow_intensity);
         frequency_right= findViewById(R.id.right_arrow_frequency);
         frequency_left= findViewById(R.id.left_arrow_frequency);
+        pvtBtn = findViewById(R.id.pvtbtn);
         intensity_right.setOnClickListener(this);
         intensity_left.setOnClickListener(this);
         frequency_right.setOnClickListener(this);
         frequency_left.setOnClickListener(this);
+        pvtBtn.setOnClickListener(this);
 
         leftAdaptor = new ArrayAdapter<>(
                 MainActivity.this,
@@ -518,6 +529,9 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                     } else if (deviceUuid.equals(LumosServices.batteryCharUUID)){
                         batteryChar = characteristic;
                         addLeftList("batteryChar");
+                    }else if(deviceUuid.equals(LumosServices.pvtCharUUID)){
+                        pvtChar = characteristic;
+                        addLeftList("PVTchar");
                     }else{
                         addLeftList(deviceUuid);
                     }
@@ -638,6 +652,23 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                         }
                     });
 
+                }else if(deviceUuid.equals(LumosServices.pvtCharUUID)){
+                    byte[] currentvalue = characteristic.getValue();
+                    if(wait4PVTResult == true && currentvalue[0] == 0xFF){
+                        wait4PVTResult = false;
+                        Log.i("PVT", "pvt game started");
+                    }else{
+                        pvtResult[currentResult] = currentvalue[0];
+                        if(currentResult == 2){
+                            Log.i("PVT","result is : " + pvtResult);
+                            currentResult = 0;
+                        }
+                    }
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                        }
+                    });
                 }
             //readChar(characteristic);
         }
@@ -1228,6 +1259,14 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                 break;
             case R.id.right_arrow_frequency:
                 seekbar_frequency.setProgress(seekbar_frequency.getProgress()+1);
+                break;
+            case R.id.pvtbtn:
+                pvtChar.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
+                byte[] byteArray = { 0x0F };
+                RlightChar.setValue(byteArray);
+                wait4PVTResult = true;
+                Log.i("PVT", "send notification to start PVT game" );
+                //start the PVTgame
                 break;
             default:
                 break;
