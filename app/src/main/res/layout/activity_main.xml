@@ -600,6 +600,23 @@
                             app:layout_constraintRight_toLeftOf="@id/right_arrow_frequency"/>
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
+                    <TextView
+                        android:id="@+id/pvt_txt"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+
+                        android:layout_marginLeft="8dp"
+
+                        android:layout_marginRight="8dp"
+                        android:layout_marginTop="15dp"
+                        android:fontFamily="@font/maven_pro_bold"
+                        android:lineHeight="17dp"
+                        android:text="Press to Start game"
+                        android:textColor="@color/white"
+                        android:textSize="14dp"
+                        app:layout_constraintTop_toBottomOf="@id/frequency_info" />
+
+
                     <Button
                         android:id="@+id/pvtbtn"
                         android:layout_width="0px"
@@ -613,10 +630,27 @@
                         android:textAllCaps="false"
                         android:textColor="@color/btn_textcolor_switcher"
                         android:textSize="14dp"
-                        app:layout_constraintDimensionRatio="h,263:30"
-                        app:layout_constraintTop_toBottomOf="@id/frequency_info"
+                        app:layout_constraintDimensionRatio="h,263:70"
+                        app:layout_constraintTop_toBottomOf="@id/pvt_txt"
                         app:layout_constraintLeft_toLeftOf="parent"
-                        app:layout_constraintWidth_percent="1" />
+                        app:layout_constraintWidth_percent="0.4" />
+                    <Button
+                        android:id="@+id/pvtbtn_continue"
+                        android:layout_width="0px"
+                        android:layout_height="0px"
+                        android:layout_marginTop="15dp"
+                        android:layout_marginRight="10dp"
+
+                        android:background="@drawable/lightgreen_btn_style"
+                        android:fontFamily="@font/maven_pro_black"
+                        android:text="Continue"
+                        android:textAllCaps="false"
+                        android:textColor="@color/btn_textcolor_switcher"
+                        android:textSize="14dp"
+                        app:layout_constraintDimensionRatio="h,263:70"
+                        app:layout_constraintTop_toBottomOf="@id/pvt_txt"
+                        app:layout_constraintRight_toRightOf="parent"
+                        app:layout_constraintWidth_percent="0.4" />
 
                     <LinearLayout
                         android:layout_width="0dp"

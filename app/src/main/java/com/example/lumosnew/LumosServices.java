@@ -39,7 +39,7 @@ public class LumosServices {
     public static String RlightCharUUID = "3f5a21ed-83df-4e71-9507-a043114c95db";
     public static String RbatteryCharUUID = "f38f1739-f2e8-447c-a0fe-72d293cfdbee";
 
-    public static String pvtCharUUID = "03F2E1D0-CFCF-BEAD-9C8B-7A6F5E4D3C2B1A";
+    public static String pvtCharUUID = "03f2e1d0-cfbe-ad9c-8b7a-6f5e4d3c2b1a";
 
     public static String RLconnectedUUID = "13264462-3995-11eb-adc1-0242ac120002";
 

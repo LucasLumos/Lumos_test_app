@@ -19,7 +19,6 @@ import android.bluetooth.le.ScanFilter;
 import android.bluetooth.le.ScanResult;
 import android.bluetooth.le.ScanSettings;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -97,7 +96,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     // Necessary objects for BLE operations
     private static BluetoothAdapter mBluetoothAdapter;
     private static BluetoothLeScanner mBluetoothLeScanner;
-        // Whether the application is currently scanning or not
+    // Whether the application is currently scanning or not
     private boolean mScanning;
 
     // The list of devices
@@ -126,6 +125,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     private TextView rbat;
     private TextView lcap;
     private TextView rcap;
+    private TextView pvt_text;
     private Switch light_switch;
     private SeekBar seekbar_intensity, seekbar_frequency;
     private Button reset_btn;
@@ -164,11 +164,14 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     private Button btnReset;
 
     private Button pvtBtn;
+    private Button pvtBtn_continue;
+
 
     private byte[] pvtResult = new byte[3];
-    private boolean wait4PVTResult = false;
+    private boolean game_started = false;
 
-    private int currentResult = 0;
+
+    private int current_round_pvt = 0;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -200,17 +203,21 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         rightListview = findViewById(R.id.right_list );
         leftState = findViewById(R.id.light_exposure_status_left_state );
         rightState = findViewById(R.id.light_exposure_status_right_state );
+        pvt_text = findViewById(R.id.pvt_txt);
+
 
         intensity_right = findViewById(R.id.right_arrow_intensity);
         intensity_left= findViewById(R.id.left_arrow_intensity);
         frequency_right= findViewById(R.id.right_arrow_frequency);
         frequency_left= findViewById(R.id.left_arrow_frequency);
         pvtBtn = findViewById(R.id.pvtbtn);
+        pvtBtn_continue = findViewById(R.id.pvtbtn_continue);
         intensity_right.setOnClickListener(this);
         intensity_left.setOnClickListener(this);
         frequency_right.setOnClickListener(this);
         frequency_left.setOnClickListener(this);
         pvtBtn.setOnClickListener(this);
+        pvtBtn_continue.setOnClickListener(this);
 
         leftAdaptor = new ArrayAdapter<>(
                 MainActivity.this,
@@ -537,19 +544,19 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                     }
                 }
 
-                    leftPCBConnected = true;
+                leftPCBConnected = true;
 
-                    if (rightPCBConnected){
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                // Stuff that updates the UI
-                                offbutton();
+                if (rightPCBConnected){
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            // Stuff that updates the UI
+                            offbutton();
 //                                lcon.setText("Status: Connected");
-                                connectedUI();
-                            }
-                        });
-                    }
+                            connectedUI();
+                        }
+                    });
+                }
 
                 for (BluetoothGattCharacteristic characteristic: LBluetoothGatt.getService(UUID.fromString("56f59bd1-dc9e-4447-9ba5-88d3c27c6281")).getCharacteristics()) {
                     chars.add(characteristic);
@@ -594,82 +601,88 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
             // Get update for the new value
             Log.w(TAG, "Certain value on the board has changed..." );
             String deviceUuid = characteristic.getUuid().toString();
-                if (deviceUuid.equals(LumosServices.ledCharUUID)){
-                    LEDLValue = characteristic.getValue();
-                    Log.d(TAG, "LED has changed on left PCB " + LEDLValue[0]);
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            //lled.setText(String.valueOf(LEDLValue[0]));
-                        }
-                    });
-                }else if  (deviceUuid.equals(LumosServices.buttonCharUUID)) {
-                    buttonLValue = characteristic.getValue();
-                    Log.d(TAG, "button has changed on left PCB " + buttonLValue[0]);
-
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            //lbtn.setText(String.valueOf(buttonLValue[0]));
-                        }
-                    });
-                }else if  (deviceUuid.equals(LumosServices.capCharUUID)) {
-                    capLValue = characteristic.getValue();
-                    Log.d(TAG, "capsense has changed on left PCB " + capLValue[0]);
-
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            lcap.setText(String.valueOf(capLValue[0]));
-                        }
-                    });
-                }else if  (deviceUuid.equals(LumosServices.alsCharUUID)) {
-                    alsLValue = characteristic.getValue();
-                    int voltage1 = (int) alsLValue[1];
-                    int voltage2 = (int) alsLValue[0];
-                    int voltage = voltage1*16*16 + voltage2;
-
-                    Log.d(TAG, "als has changed on left PCB " + voltage);
-
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            lals.setText(String.valueOf(voltage));
-                        }
-                    });
-                }else if  (deviceUuid.equals(LumosServices.batteryCharUUID)) {
-                    batteryLValue = characteristic.getValue();
-                    int voltage1 = (int) batteryLValue[1];
-                    int voltage2 = (int) batteryLValue[0];
-                    int voltage = voltage1*16*16 + voltage2;
-
-                    Log.d(TAG, "battery has changed on left PCB " + voltage);
-
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            lbat.setText(voltage / 33 + "%");
-                        }
-                    });
-
-                }else if(deviceUuid.equals(LumosServices.pvtCharUUID)){
-                    byte[] currentvalue = characteristic.getValue();
-                    if(wait4PVTResult == true && currentvalue[0] == 0xFF){
-                        wait4PVTResult = false;
-                        Log.i("PVT", "pvt game started");
-                    }else{
-                        pvtResult[currentResult] = currentvalue[0];
-                        if(currentResult == 2){
-                            Log.i("PVT","result is : " + pvtResult);
-                            currentResult = 0;
-                        }
+            if (deviceUuid.equals(LumosServices.ledCharUUID)){
+                LEDLValue = characteristic.getValue();
+                Log.d(TAG, "LED has changed on left PCB " + LEDLValue[0]);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        //lled.setText(String.valueOf(LEDLValue[0]));
                     }
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                        }
-                    });
+                });
+            }else if  (deviceUuid.equals(LumosServices.buttonCharUUID)) {
+                buttonLValue = characteristic.getValue();
+                Log.d(TAG, "button has changed on left PCB " + buttonLValue[0]);
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        //lbtn.setText(String.valueOf(buttonLValue[0]));
+                    }
+                });
+            }else if  (deviceUuid.equals(LumosServices.capCharUUID)) {
+                capLValue = characteristic.getValue();
+                Log.d(TAG, "capsense has changed on left PCB " + capLValue[0]);
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        lcap.setText(String.valueOf(capLValue[0]));
+                    }
+                });
+            }else if  (deviceUuid.equals(LumosServices.alsCharUUID)) {
+                alsLValue = characteristic.getValue();
+                int voltage1 = (int) alsLValue[1];
+                int voltage2 = (int) alsLValue[0];
+                int voltage = voltage1*16*16 + voltage2;
+
+                Log.d(TAG, "als has changed on left PCB " + voltage);
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        lals.setText(String.valueOf(voltage));
+                    }
+                });
+            }else if  (deviceUuid.equals(LumosServices.batteryCharUUID)) {
+                batteryLValue = characteristic.getValue();
+                int voltage1 = (int) batteryLValue[1];
+                int voltage2 = (int) batteryLValue[0];
+                int voltage = voltage1*16*16 + voltage2;
+
+                Log.d(TAG, "battery has changed on left PCB " + voltage);
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        lbat.setText(voltage / 33 + "%");
+                    }
+                });
+
+            }else if(deviceUuid.equals(LumosServices.pvtCharUUID)){
+                byte[] currentvalue = characteristic.getValue();
+                Log.i("PVT", "got callback value: " + String.format("%02X", currentvalue[0]));
+                if(game_started == false && currentvalue[0] == (byte)0xAA){
+                    game_started = true;
+                    pvt_text.setText("Game Started");
+                }else{
+                    if(currentvalue[0] == (byte) 0x00){
+                        pvt_text.setText("Lapse");
+                    }else if(currentvalue[0] == (byte) 0xFF){
+                        pvt_text.setText("Miss");
+                    }else{
+                        int result = (int) (100 + (0xff&currentvalue[0] - 1) * (400.0 / 253));
+                        pvt_text.setText("Hit : " + result + " ms");
+                    }
+                    current_round_pvt++;
+                    if(current_round_pvt == 10){
+                        pvt_text.setText("Game Finished");
+                        current_round_pvt = 0;
+                        game_started = false;
+                    }
                 }
+
+            }
             //readChar(characteristic);
         }
     };
@@ -747,20 +760,20 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                 }
 
 
-                    Log.d(TAG, "right PCB chars all connected");
+                Log.d(TAG, "right PCB chars all connected");
 
-                    rightPCBConnected = true;
+                rightPCBConnected = true;
 
-                    if (leftPCBConnected){
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                // Stuff that updates the UI
+                if (leftPCBConnected){
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            // Stuff that updates the UI
 //                                lcon.setText("connected");
-                                connectedUI();
-                            }
-                        });
-                    }
+                            connectedUI();
+                        }
+                    });
+                }
 
                 for (BluetoothGattCharacteristic characteristic: RBluetoothGatt.getService(UUID.fromString("9ab00bd6-1ab9-4912-abc6-f1d44a0dd7a4")).getCharacteristics()) {
                     charsR.add(characteristic);
@@ -1262,12 +1275,16 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                 break;
             case R.id.pvtbtn:
                 pvtChar.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
-                byte[] byteArray = { 0x0F };
-                RlightChar.setValue(byteArray);
-                wait4PVTResult = true;
-                Log.i("PVT", "send notification to start PVT game" );
+                byte[] byteArray = { (byte) 0x00 };
+                pvtChar.setValue(byteArray);
+                LBluetoothGatt.writeCharacteristic(pvtChar);
                 //start the PVTgame
                 break;
+            case R.id.pvtbtn_continue:
+                pvtChar.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
+                byte[] byteArray_start = {(byte) 0xCC};
+                pvtChar.setValue(byteArray_start);
+                LBluetoothGatt.writeCharacteristic(pvtChar);
             default:
                 break;
         }
@@ -1338,5 +1355,21 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         }
         Log.i("felix","frequency progress :"+seekbar_frequency.getProgress());
         Log.i("felix","intensity progress :"+seekbar_intensity.getProgress());
+    }
+
+    public static String byteArrayToHexString(byte[] byteArray) {
+        StringBuilder hexBuilder = new StringBuilder();
+
+        // Loop through the byte array
+        for (byte b : byteArray) {
+            // Convert each byte value to hexadecimal
+            String hexString = String.format("%02X", b);
+
+            // Append the hexadecimal value to the StringBuilder
+            hexBuilder.append(hexString);
+        }
+
+        // Return the concatenated hexadecimal representation
+        return hexBuilder.toString();
     }
 }
