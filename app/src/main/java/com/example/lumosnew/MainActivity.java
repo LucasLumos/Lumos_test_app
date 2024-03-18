@@ -35,6 +35,8 @@ import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.content.Intent;
+import android.os.Bundle;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -76,7 +78,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     private static BluetoothGattCharacteristic lightChar;
     private static BluetoothGattCharacteristic batteryChar;
 
-    private static BluetoothGattCharacteristic pvtChar;
+    public static BluetoothGattCharacteristic pvtChar;
 
     //7 characteristics in the right device
     private static BluetoothGattCharacteristic RbuttonChar;
@@ -115,7 +117,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     private static String LBluetoothDeviceAddress;
     private static String RBluetoothDeviceAddress;
 
-    private static BluetoothGatt LBluetoothGatt;
+    public static BluetoothGatt LBluetoothGatt;
     private static BluetoothGatt RBluetoothGatt;
 
 
@@ -125,7 +127,6 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     private TextView rbat;
     private TextView lcap;
     private TextView rcap;
-    private TextView pvt_text;
     private Switch light_switch;
     private SeekBar seekbar_intensity, seekbar_frequency;
     private Button reset_btn;
@@ -164,14 +165,10 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     private Button btnReset;
 
     private Button pvtBtn;
-    private Button pvtBtn_continue;
+    static public boolean pvt_read_to_read = false;
+    static public byte pvt_value;
 
-
-    private byte[] pvtResult = new byte[3];
-    private boolean game_started = false;
-
-
-    private int current_round_pvt = 0;
+    static public boolean pvt_game_just_start = false;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -203,7 +200,6 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         rightListview = findViewById(R.id.right_list );
         leftState = findViewById(R.id.light_exposure_status_left_state );
         rightState = findViewById(R.id.light_exposure_status_right_state );
-        pvt_text = findViewById(R.id.pvt_txt);
 
 
         intensity_right = findViewById(R.id.right_arrow_intensity);
@@ -211,13 +207,11 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         frequency_right= findViewById(R.id.right_arrow_frequency);
         frequency_left= findViewById(R.id.left_arrow_frequency);
         pvtBtn = findViewById(R.id.pvtbtn);
-        pvtBtn_continue = findViewById(R.id.pvtbtn_continue);
         intensity_right.setOnClickListener(this);
         intensity_left.setOnClickListener(this);
         frequency_right.setOnClickListener(this);
         frequency_left.setOnClickListener(this);
         pvtBtn.setOnClickListener(this);
-        pvtBtn_continue.setOnClickListener(this);
 
         leftAdaptor = new ArrayAdapter<>(
                 MainActivity.this,
@@ -662,24 +656,13 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
             }else if(deviceUuid.equals(LumosServices.pvtCharUUID)){
                 byte[] currentvalue = characteristic.getValue();
                 Log.i("PVT", "got callback value: " + String.format("%02X", currentvalue[0]));
-                if(game_started == false && currentvalue[0] == (byte)0xAA){
-                    game_started = true;
-                    pvt_text.setText("Game Started");
+                if(pvt_game_just_start == true && currentvalue[0] == (byte)0xAA){
+                    pvt_game_just_start = false;
+//                    pvt_text.setText("Game Started"); work here
                 }else{
-                    if(currentvalue[0] == (byte) 0x00){
-                        pvt_text.setText("Lapse");
-                    }else if(currentvalue[0] == (byte) 0xFF){
-                        pvt_text.setText("Miss");
-                    }else{
-                        int result = (int) (100 + (0xff&currentvalue[0] - 1) * (400.0 / 253));
-                        pvt_text.setText("Hit : " + result + " ms");
-                    }
-                    current_round_pvt++;
-                    if(current_round_pvt == 10){
-                        pvt_text.setText("Game Finished");
-                        current_round_pvt = 0;
-                        game_started = false;
-                    }
+                    Log.i("PVT", "value ready to read");
+                    pvt_value = currentvalue[0];
+                    pvt_read_to_read = true;
                 }
 
             }
@@ -1254,6 +1237,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void onClick(View v) {
         switch (v.getId()){
@@ -1277,14 +1261,12 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                 pvtChar.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
                 byte[] byteArray = { (byte) 0x00 };
                 pvtChar.setValue(byteArray);
-                LBluetoothGatt.writeCharacteristic(pvtChar);
-                //start the PVTgame
+                if(LBluetoothGatt.writeCharacteristic(pvtChar)){
+                    pvt_game_just_start = true;
+                    Intent intent = new Intent(this, PvtGame.class);
+                    startActivity(intent);
+                }
                 break;
-            case R.id.pvtbtn_continue:
-                pvtChar.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
-                byte[] byteArray_start = {(byte) 0xCC};
-                pvtChar.setValue(byteArray_start);
-                LBluetoothGatt.writeCharacteristic(pvtChar);
             default:
                 break;
         }
