@@ -50,6 +50,7 @@
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@id/light_exposure_text_title"
+            android:layout_marginBottom="30dp"
             app:layout_constraintWidth_percent="0.8293">
 
             <LinearLayout
@@ -176,6 +177,12 @@
                     android:background="@drawable/component_background"
                     android:padding="24dp">
 
+                    <androidx.constraintlayout.widget.Guideline
+                        android:id="@+id/vertical_guideline"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        app:layout_constraintGuide_percent="0.5" />
                     <TextView
                         android:id="@+id/light_exposure_battery_component_text_title"
                         android:layout_width="match_parent"
@@ -211,7 +218,7 @@
 
                         <TextView
                             android:id="@+id/left_battery_text_power_percentage"
-                            android:layout_width="45dp"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
 
                             android:fontFamily="@font/maven_pro_regular"
@@ -230,7 +237,7 @@
                         android:layout_marginTop="12dp"
                         android:gravity="center"
                         android:orientation="horizontal"
-                        app:layout_constraintRight_toRightOf="parent"
+                        app:layout_constraintLeft_toRightOf="@id/vertical_guideline"
                         app:layout_constraintTop_toBottomOf="@+id/light_exposure_battery_component_text_title">
 
                         <TextView
@@ -244,7 +251,7 @@
 
                         <TextView
                             android:id="@+id/right_battery_text_power_percentage"
-                            android:layout_width="45dp"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
 
                             android:fontFamily="@font/maven_pro_regular"
@@ -291,7 +298,7 @@
 
                         <TextView
                             android:id="@+id/ALS_left_value"
-                            android:layout_width="40dp"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
 
                             android:fontFamily="@font/maven_pro_regular"
@@ -310,7 +317,7 @@
                         android:layout_marginTop="12dp"
                         android:gravity="center"
                         android:orientation="horizontal"
-                        app:layout_constraintRight_toRightOf="parent"
+                        app:layout_constraintLeft_toRightOf="@id/vertical_guideline"
                         app:layout_constraintTop_toBottomOf="@+id/ALS_title">
 
                         <TextView
@@ -324,7 +331,7 @@
 
                         <TextView
                             android:id="@+id/ALS_right_value"
-                            android:layout_width="40dp"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
 
                             android:layout_marginRight="5dp"
@@ -337,7 +344,7 @@
                     </LinearLayout>
 
                     <TextView
-                        android:id="@+id/Cap"
+                        android:id="@+id/cal"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
 
@@ -345,13 +352,13 @@
 
                         android:fontFamily="@font/maven_pro_bold"
                         android:lineHeight="21dp"
-                        android:text="Cap"
+                        android:text="Cal"
                         android:textColor="@color/white"
                         android:textSize="18dp"
                         app:layout_constraintTop_toBottomOf="@id/ALS_right" />
 
                     <LinearLayout
-                        android:id="@+id/Cap_left"
+                        android:id="@+id/cal_left"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
 
@@ -359,7 +366,7 @@
                         android:gravity="center"
                         android:orientation="horizontal"
                         app:layout_constraintLeft_toLeftOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/Cap">
+                        app:layout_constraintTop_toBottomOf="@+id/cal">
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -371,8 +378,8 @@
                             android:textSize="16dp" />
 
                         <TextView
-                            android:id="@+id/Cap_left_value"
-                            android:layout_width="40dp"
+                            android:id="@+id/cal_left_value"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
 
                             android:fontFamily="@font/maven_pro_regular"
@@ -384,15 +391,15 @@
                     </LinearLayout>
 
                     <LinearLayout
-                        android:id="@+id/Cap_right"
+                        android:id="@+id/cal_right"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
 
                         android:layout_marginTop="12dp"
                         android:gravity="center"
                         android:orientation="horizontal"
-                        app:layout_constraintRight_toRightOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/Cap">
+                        app:layout_constraintLeft_toRightOf="@id/vertical_guideline"
+                        app:layout_constraintTop_toBottomOf="@+id/cal">
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -404,8 +411,332 @@
                             android:textSize="16dp" />
 
                         <TextView
-                            android:id="@+id/Cap_right_value"
-                            android:layout_width="40dp"
+                            android:id="@+id/cal_right_value"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+
+                            android:layout_marginRight="5dp"
+                            android:fontFamily="@font/maven_pro_regular"
+                            android:gravity="right"
+                            android:text="0"
+                            android:textColor="@color/white"
+                            android:textSize="16dp" />
+
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/cal2"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+
+                        android:layout_marginTop="16dp"
+
+                        android:fontFamily="@font/maven_pro_bold"
+                        android:lineHeight="21dp"
+                        android:text="Cal2"
+                        android:textColor="@color/white"
+                        android:textSize="18dp"
+                        app:layout_constraintTop_toBottomOf="@id/cal_right" />
+
+                    <LinearLayout
+                        android:id="@+id/cal2_left"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+
+                        android:layout_marginTop="12dp"
+                        android:gravity="center"
+                        android:orientation="horizontal"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/cal2">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+
+                            android:fontFamily="@font/maven_pro_regular"
+                            android:text="Left:"
+                            android:textColor="@color/white"
+                            android:textSize="16dp" />
+
+                        <TextView
+                            android:id="@+id/cal2_left_value"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+
+                            android:fontFamily="@font/maven_pro_regular"
+                            android:gravity="right"
+                            android:text="0"
+                            android:textColor="@color/white"
+                            android:textSize="16dp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/cal2_right"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+
+                        android:layout_marginTop="12dp"
+                        android:gravity="center"
+                        android:orientation="horizontal"
+                        app:layout_constraintLeft_toRightOf="@id/vertical_guideline"
+                        app:layout_constraintTop_toBottomOf="@+id/cal2">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+
+                            android:fontFamily="@font/maven_pro_regular"
+                            android:text="Right:"
+                            android:textColor="@color/white"
+                            android:textSize="16dp" />
+
+                        <TextView
+                            android:id="@+id/cal2_right_value"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+
+                            android:layout_marginRight="5dp"
+                            android:fontFamily="@font/maven_pro_regular"
+                            android:gravity="right"
+                            android:text="0"
+                            android:textColor="@color/white"
+                            android:textSize="16dp" />
+
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/cal3"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+
+                        android:layout_marginTop="16dp"
+
+                        android:fontFamily="@font/maven_pro_bold"
+                        android:lineHeight="21dp"
+                        android:text="Cal3"
+                        android:textColor="@color/white"
+                        android:textSize="18dp"
+                        app:layout_constraintTop_toBottomOf="@id/cal2_right" />
+
+                    <LinearLayout
+                        android:id="@+id/cal3_left"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+
+                        android:layout_marginTop="12dp"
+                        android:gravity="center"
+                        android:orientation="horizontal"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/cal3">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+
+                            android:fontFamily="@font/maven_pro_regular"
+                            android:text="Left:"
+                            android:textColor="@color/white"
+                            android:textSize="16dp" />
+
+                        <TextView
+                            android:id="@+id/cal3_left_value"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+
+                            android:fontFamily="@font/maven_pro_regular"
+                            android:gravity="right"
+                            android:text="0"
+                            android:textColor="@color/white"
+                            android:textSize="16dp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/cal3_right"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+
+                        android:layout_marginTop="12dp"
+                        android:gravity="center"
+                        android:orientation="horizontal"
+                        app:layout_constraintLeft_toRightOf="@id/vertical_guideline"
+                        app:layout_constraintTop_toBottomOf="@+id/cal3">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+
+                            android:fontFamily="@font/maven_pro_regular"
+                            android:text="Right:"
+                            android:textColor="@color/white"
+                            android:textSize="16dp" />
+
+                        <TextView
+                            android:id="@+id/cal3_right_value"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+
+                            android:layout_marginRight="5dp"
+                            android:fontFamily="@font/maven_pro_regular"
+                            android:gravity="right"
+                            android:text="0"
+                            android:textColor="@color/white"
+                            android:textSize="16dp" />
+
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/prox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+
+                        android:layout_marginTop="16dp"
+
+                        android:fontFamily="@font/maven_pro_bold"
+                        android:lineHeight="21dp"
+                        android:text="Prox"
+                        android:textColor="@color/white"
+                        android:textSize="18dp"
+                        app:layout_constraintTop_toBottomOf="@id/cal3_right" />
+
+                    <LinearLayout
+                        android:id="@+id/proxLeft"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+
+                        android:layout_marginTop="12dp"
+                        android:gravity="center"
+                        android:orientation="horizontal"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/prox">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+
+                            android:fontFamily="@font/maven_pro_regular"
+                            android:text="Left:"
+                            android:textColor="@color/white"
+                            android:textSize="16dp" />
+
+                        <TextView
+                            android:id="@+id/prox_left_value"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+
+                            android:fontFamily="@font/maven_pro_regular"
+                            android:gravity="right"
+                            android:text="0"
+                            android:textColor="@color/white"
+                            android:textSize="16dp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/proxRight"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+
+                        android:layout_marginTop="12dp"
+                        android:gravity="center"
+                        android:orientation="horizontal"
+                        app:layout_constraintLeft_toRightOf="@id/vertical_guideline"
+                        app:layout_constraintTop_toBottomOf="@+id/prox">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+
+                            android:fontFamily="@font/maven_pro_regular"
+                            android:text="Right:"
+                            android:textColor="@color/white"
+                            android:textSize="16dp" />
+
+                        <TextView
+                            android:id="@+id/prox_right_value"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+
+                            android:layout_marginRight="5dp"
+                            android:fontFamily="@font/maven_pro_regular"
+                            android:gravity="right"
+                            android:text="0"
+                            android:textColor="@color/white"
+                            android:textSize="16dp" />
+
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/led"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+
+                        android:layout_marginTop="16dp"
+
+                        android:fontFamily="@font/maven_pro_bold"
+                        android:lineHeight="21dp"
+                        android:text="Led"
+                        android:textColor="@color/white"
+                        android:textSize="18dp"
+                        app:layout_constraintTop_toBottomOf="@id/proxRight" />
+
+                    <LinearLayout
+                        android:id="@+id/lefLeft"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+
+                        android:layout_marginTop="12dp"
+                        android:gravity="center"
+                        android:orientation="horizontal"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/led">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+
+                            android:fontFamily="@font/maven_pro_regular"
+                            android:text="Left:"
+                            android:textColor="@color/white"
+                            android:textSize="16dp" />
+
+                        <TextView
+                            android:id="@+id/led_left_value"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+
+                            android:fontFamily="@font/maven_pro_regular"
+                            android:gravity="right"
+                            android:text="0"
+                            android:textColor="@color/white"
+                            android:textSize="16dp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/ledRight"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+
+                        android:layout_marginTop="12dp"
+                        android:gravity="center"
+                        android:orientation="horizontal"
+                        app:layout_constraintLeft_toRightOf="@id/vertical_guideline"
+                        app:layout_constraintTop_toBottomOf="@+id/led">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+
+                            android:fontFamily="@font/maven_pro_regular"
+                            android:text="Right:"
+                            android:textColor="@color/white"
+                            android:textSize="16dp" />
+
+                        <TextView
+                            android:id="@+id/led_right_value"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
 
                             android:layout_marginRight="5dp"
@@ -455,7 +786,7 @@
 
                         android:layout_marginTop="15dp"
 
-                        android:max="100"
+                        android:max="255"
                         android:min="0"
                         android:paddingStart="8dp"
                         android:paddingEnd="8dp"

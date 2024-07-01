@@ -38,6 +38,10 @@ import android.widget.Toast;
 import android.content.Intent;
 import android.os.Bundle;
 
+import org.w3c.dom.Text;
+
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -61,33 +65,32 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     public boolean leftPCBConnected = false;
     public boolean rightPCBConnected = false;
 
-    // Indicating whether this is the first time reading every characteristic
-    private boolean LFirstTimeRead = true;
-    private boolean RFirstTimeRead = true;
-
+    // Indicating whether this is the first time reading every characteristi
     private byte[] lightValue;
 
     // The list of characteristics contained by the device
     public static List<BluetoothGattCharacteristic> characteristics;
 
     // All 6 characteristics in the left device
-    private static BluetoothGattCharacteristic buttonChar;
-    private static BluetoothGattCharacteristic capChar;
-    private static BluetoothGattCharacteristic ledChar;
-    private static BluetoothGattCharacteristic alsChar;
-    private static BluetoothGattCharacteristic lightChar;
-    private static BluetoothGattCharacteristic batteryChar;
-
+    private static BluetoothGattCharacteristic leftLedChar;
+    private static BluetoothGattCharacteristic leftAlsChar;
+    private static BluetoothGattCharacteristic leftLightIntensityChar;
+    private static BluetoothGattCharacteristic leftBatteryChar;
+    private static BluetoothGattCharacteristic leftProxChar;
     public static BluetoothGattCharacteristic pvtChar;
+    private static BluetoothGattCharacteristic leftCalChar;
+    private static BluetoothGattCharacteristic leftCal2Char;
+    private static BluetoothGattCharacteristic leftCal3Char;
 
     //7 characteristics in the right device
-    private static BluetoothGattCharacteristic RbuttonChar;
-    private static BluetoothGattCharacteristic RcapChar;
-    private static BluetoothGattCharacteristic RledChar;
-    private static BluetoothGattCharacteristic RalsChar;
-    private static BluetoothGattCharacteristic RlightChar;
-    private static BluetoothGattCharacteristic RbatteryChar;
-    //private static BluetoothGattCharacteristic RlconnectedChar;
+    private static BluetoothGattCharacteristic rightLedChar;
+    private static BluetoothGattCharacteristic rightAlsChar;
+    private static BluetoothGattCharacteristic rightLightIntensityChar;
+    private static BluetoothGattCharacteristic rightBatteryChar;
+    private static BluetoothGattCharacteristic rightProxChar;
+    private static BluetoothGattCharacteristic rightCalChar;
+    private static BluetoothGattCharacteristic rightCal2Char;
+    private static BluetoothGattCharacteristic rightCal3Char;
 
     // Tag used for displaying Toast message
     private final static String TAG = MainActivity.class.getSimpleName();
@@ -121,12 +124,14 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     private static BluetoothGatt RBluetoothGatt;
 
 
-    private TextView lals;
-    private TextView lbat;
-    private TextView rals;
-    private TextView rbat;
-    private TextView lcap;
-    private TextView rcap;
+    private TextView lals,rals;
+    private TextView lbat,rbat;
+    private TextView lprox,rprox;
+    private TextView lcal,rcal;
+    private TextView lcal2,rcal2;
+    private TextView lcal3,rcal3;
+    private TextView lled,rled;
+
     private Switch light_switch;
     private SeekBar seekbar_intensity, seekbar_frequency;
     private Button reset_btn;
@@ -142,10 +147,6 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     private ArrayAdapter<String> leftAdaptor;
     private ArrayAdapter<String> rightAdaptor;
 
-
-
-
-
     private byte[] LEDLValue;
     private byte[] buttonLValue;
     private byte[] capLValue;
@@ -159,11 +160,6 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     private byte[] batteryRValue;
     //private byte[] RLCValue;
 
-    private Button btnOn;
-    private Button btnGamma;
-    private Button btnOff;
-    private Button btnReset;
-
     private Button pvtBtn;
     static public boolean pvt_read_to_read = false;
     static public byte pvt_value;
@@ -176,15 +172,13 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        lcap = (TextView) findViewById(R.id.Cap_left_value);
-        rcap = (TextView) findViewById(R.id.Cap_right_value);
-
 //        lcon = (TextView) findViewById(R.id.lcon);
         lals = (TextView) findViewById(R.id.ALS_left_value);
         lbat = (TextView) findViewById(R.id.left_battery_text_power_percentage);
 
         rals = (TextView) findViewById(R.id.ALS_right_value);
         rbat = (TextView) findViewById(R.id.right_battery_text_power_percentage);
+
         seekbar_intensity = (SeekBar) findViewById(R.id.light_control_light_intensity_seekbar);
         seekbar_frequency = (SeekBar) findViewById(R.id.light_control_light_frequency_seekbar);
         light_switch = (Switch) findViewById(R.id.power);
@@ -212,6 +206,17 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         frequency_right.setOnClickListener(this);
         frequency_left.setOnClickListener(this);
         pvtBtn.setOnClickListener(this);
+
+        lprox = (TextView) findViewById(R.id.prox_left_value );
+        rprox = (TextView) findViewById(R.id.prox_right_value );
+        lcal = (TextView) findViewById(R.id.cal_left_value );
+        rcal = (TextView) findViewById(R.id.cal_right_value );
+        lcal2 = (TextView) findViewById(R.id.cal2_left_value );
+        rcal2 = (TextView) findViewById(R.id.cal2_right_value );
+        lcal3 = (TextView) findViewById(R.id.cal3_left_value );
+        rcal3 = (TextView) findViewById(R.id.cal3_right_value );
+        lled = (TextView) findViewById(R.id.led_left_value);
+        rled = (TextView) findViewById(R.id.led_right_value);
 
         leftAdaptor = new ArrayAdapter<>(
                 MainActivity.this,
@@ -480,6 +485,14 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                 Log.i(TAG, "Attempting to start service discovery:" +
                         LBluetoothGatt.discoverServices());
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        leftItems.clear();//debug
+                        leftAdaptor.notifyDataSetChanged();
+                    }
+                });
+
                 setLeftState("disconnected");
                 LConnectionState = STATE_DISCONNECTED;
                 leftPCBConnected = false;
@@ -495,6 +508,8 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                     }
                 });
                 scanLeDevice(true);
+
+
             }
 
         }
@@ -512,27 +527,33 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                 // Assign every characteristic to an object
                 for (BluetoothGattCharacteristic characteristic : characteristics){
                     String deviceUuid = characteristic.getUuid().toString();
-                    if (deviceUuid.equals(LumosServices.buttonCharUUID)){
-                        buttonChar = characteristic;
-                        addLeftList("buttonChar");
-                    } else if (deviceUuid.equals(LumosServices.capCharUUID)){
-                        capChar = characteristic;
-                        addLeftList("capChar");
-                    } else if (deviceUuid.equals(LumosServices.ledCharUUID)){
-                        ledChar = characteristic;
-                        addLeftList("ledChar");
-                    } else if (deviceUuid.equals(LumosServices.alsCharUUID)){
-                        alsChar = characteristic;
-                        addLeftList("alsChar");
-                    } else if (deviceUuid.equals(LumosServices.lightCharUUID)){
-                        lightChar = characteristic;
-                        addLeftList("lightChar");
-                    } else if (deviceUuid.equals(LumosServices.batteryCharUUID)){
-                        batteryChar = characteristic;
-                        addLeftList("batteryChar");
-                    }else if(deviceUuid.equals(LumosServices.pvtCharUUID)){
+                    if (deviceUuid.equals(LumosServices.ledLeftCharUUID)){
+                        leftLedChar = characteristic;
+                        addLeftList("leftLedChar");
+                    } else if (deviceUuid.equals(LumosServices.alsLeftCharUUID)){
+                        leftAlsChar = characteristic;
+                        addLeftList("leftAlsChar");
+                    } else if (deviceUuid.equals(LumosServices.lightIntensityLeftCharUUID)){
+                        leftLightIntensityChar = characteristic;
+                        addLeftList("leftLightIntensityChar");
+                    } else if (deviceUuid.equals(LumosServices.batteryLeftCharUUID)){
+                        leftBatteryChar = characteristic;
+                        addLeftList("batteryLeftCharUUID");
+                    } else if (deviceUuid.equals(LumosServices.proxLeftCharUUID)){
+                        leftProxChar = characteristic;
+                        addLeftList("leftProxChar");
+                    }else if(deviceUuid.equals(LumosServices.pvtLeftCharUUID)){
                         pvtChar = characteristic;
                         addLeftList("PVTchar");
+                    } else if (deviceUuid.equals(LumosServices.calLeftCharUUID)){
+                        leftCalChar = characteristic;
+                        addLeftList("leftCalChar");
+                    } else if (deviceUuid.equals(LumosServices.cal2LeftCharUUID)){
+                        leftCal2Char = characteristic;
+                        addLeftList("leftCal2Char");
+                    } else if (deviceUuid.equals(LumosServices.cal3LeftCharUUID)){
+                        leftCal3Char = characteristic;
+                        addLeftList("leftCal3Char");
                     }else{
                         addLeftList(deviceUuid);
                     }
@@ -581,11 +602,31 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
             // Read the characteristic and its value
             if (status == BluetoothGatt.GATT_SUCCESS) {
 
-                Log.d(TAG, "a characteristic has been read" );
-
-                Log.d(TAG, String.valueOf(characteristic.getValue()));
-
-                //readChar(characteristic);
+                String deviceUuid = characteristic.getUuid().toString();
+                if (deviceUuid.equals(LumosServices.calLeftCharUUID)){
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            lcal.setText(String.valueOf(ByteBuffer.wrap(characteristic.getValue()).order(ByteOrder.LITTLE_ENDIAN).getInt()));
+                        }
+                    });
+                }else if (deviceUuid.equals(LumosServices.cal2LeftCharUUID)){
+                    LEDRValue = characteristic.getValue();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            lcal2.setText(String.valueOf(ByteBuffer.wrap(characteristic.getValue()).order(ByteOrder.LITTLE_ENDIAN).getInt()));
+                        }
+                    });
+                }else if (deviceUuid.equals(LumosServices.cal3LeftCharUUID)){
+                    LEDRValue = characteristic.getValue();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            lcal3.setText(String.valueOf(ByteBuffer.wrap(characteristic.getValue()).order(ByteOrder.LITTLE_ENDIAN).getInt()));
+                        }
+                    });
+                }
             }
         }
         // This callback is called after whenever a characteristic has changed
@@ -595,57 +636,30 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
             // Get update for the new value
             Log.w(TAG, "Certain value on the board has changed..." );
             String deviceUuid = characteristic.getUuid().toString();
-            if (deviceUuid.equals(LumosServices.ledCharUUID)){
+            if (deviceUuid.equals(LumosServices.ledLeftCharUUID)){
                 LEDLValue = characteristic.getValue();
                 Log.d(TAG, "LED has changed on left PCB " + LEDLValue[0]);
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        //lled.setText(String.valueOf(LEDLValue[0]));
+                        lled.setText(String.valueOf(LEDLValue[0]));
                     }
                 });
-            }else if  (deviceUuid.equals(LumosServices.buttonCharUUID)) {
-                buttonLValue = characteristic.getValue();
-                Log.d(TAG, "button has changed on left PCB " + buttonLValue[0]);
-
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        //lbtn.setText(String.valueOf(buttonLValue[0]));
-                    }
-                });
-            }else if  (deviceUuid.equals(LumosServices.capCharUUID)) {
-                capLValue = characteristic.getValue();
-                Log.d(TAG, "capsense has changed on left PCB " + capLValue[0]);
-
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        lcap.setText(String.valueOf(capLValue[0]));
-                    }
-                });
-            }else if  (deviceUuid.equals(LumosServices.alsCharUUID)) {
+            }else if  (deviceUuid.equals(LumosServices.alsLeftCharUUID)) {
                 alsLValue = characteristic.getValue();
-                int voltage1 = (int) alsLValue[1];
-                int voltage2 = (int) alsLValue[0];
-                int voltage = voltage1*16*16 + voltage2;
-
-                Log.d(TAG, "als has changed on left PCB " + voltage);
+                int alsVolt = (alsLValue[1] & 0xFF) << 8 | (alsLValue[0] & 0xFF);
 
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        lals.setText(String.valueOf(voltage));
+                        lals.setText(String.valueOf(alsVolt));
                     }
                 });
-            }else if  (deviceUuid.equals(LumosServices.batteryCharUUID)) {
+            }else if  (deviceUuid.equals(LumosServices.batteryLeftCharUUID)) {
                 batteryLValue = characteristic.getValue();
                 int voltage1 = (int) batteryLValue[1];
                 int voltage2 = (int) batteryLValue[0];
                 int voltage = voltage1*16*16 + voltage2;
-
-                Log.d(TAG, "battery has changed on left PCB " + voltage);
-
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -653,7 +667,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                     }
                 });
 
-            }else if(deviceUuid.equals(LumosServices.pvtCharUUID)){
+            }else if(deviceUuid.equals(LumosServices.pvtLeftCharUUID)){
                 byte[] currentvalue = characteristic.getValue();
                 Log.i("PVT", "got callback value: " + String.format("%02X", currentvalue[0]));
                 if(pvt_game_just_start == true && currentvalue[0] == (byte)0xAA){
@@ -665,8 +679,28 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                     pvt_read_to_read = true;
                 }
 
+            }else if(deviceUuid.equals(LumosServices.proxLeftCharUUID)){
+                byte[] currentvalue = characteristic.getValue();
+                int proxPackage = ((currentvalue[3] & 0xFF) << 24) | ((currentvalue[2] & 0xFF) << 16) | ((currentvalue[1] & 0xFF) << 8) | (currentvalue[0] & 0xFF);
+
+                int proxOpenVolt = proxPackage / 10000;
+                int proxVolt = proxPackage % 10000;
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        lprox.setText(proxVolt + " op:" + proxOpenVolt);//copy
+                    }
+                });
             }
-            //readChar(characteristic);
+
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    LBluetoothGatt.readCharacteristic(leftCalChar);
+                    LBluetoothGatt.readCharacteristic(leftCal2Char);
+                    LBluetoothGatt.readCharacteristic(leftCal3Char);
+                }
+            });
         }
     };
 
@@ -685,6 +719,13 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                 Log.i(TAG, "Attempting to start service discovery for right side:" +
                         RBluetoothGatt.discoverServices());
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        rightItems.clear();
+                        rightAdaptor.notifyDataSetChanged();
+                    }
+                });
                 setRightState("disconnected");
                 RConnectionState = STATE_DISCONNECTED;
                 rightPCBConnected = false;
@@ -701,6 +742,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                 // Prints True or False
                 Log.i(TAG, "Disconnected from GATT server for right.");
                 scanLeDevice(true);
+
             }
         }
 
@@ -711,32 +753,36 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         public void onServicesDiscovered(final BluetoothGatt gatt, int status) {
             super.onServicesDiscovered(gatt, status);
             if (status == BluetoothGatt.GATT_SUCCESS) {
-
                 // Get a list of all the characteristics from the service
                 characteristics = gatt.getService(UUID.fromString(LumosServices.lumosRServiceUUID)).
                         getCharacteristics();
-                // Assign every characteristic to an object
-                Log.d(TAG, "onServicesDiscovered for Right!!!!!!!!!!!!!!!!!!!!!!!! assigning characteristics");
+                Log.i("felix","triggered" );
                 for (BluetoothGattCharacteristic characteristic : characteristics){
                     String deviceUuid = characteristic.getUuid().toString();
-                    if (deviceUuid.equals(LumosServices.RbuttonCharUUID)){
-                        addRightList("RbuttonChar");
-                        RbuttonChar = characteristic;
-                    } else if (deviceUuid.equals(LumosServices.RcapCharUUID)){
-                        addRightList("RcapChar");
-                        RcapChar = characteristic;
-                    } else if (deviceUuid.equals(LumosServices.RledCharUUID)){
-                        addRightList("RledChar");
-                        RledChar = characteristic;
-                    } else if (deviceUuid.equals(LumosServices.RalsCharUUID)){
-                        addRightList("RalsChar");
-                        RalsChar = characteristic;
-                    } else if (deviceUuid.equals(LumosServices.RlightCharUUID)){
-                        addRightList("RlightChar");
-                        RlightChar = characteristic;
-                    } else if (deviceUuid.equals(LumosServices.RbatteryCharUUID)){
-                        addRightList("RbatteryChar");
-                        RbatteryChar = characteristic;
+                    if (deviceUuid.equals(LumosServices.ledRightCharUUID)){
+                        addRightList("rightLedChar");
+                         rightLedChar= characteristic;
+                    } else if (deviceUuid.equals(LumosServices.alsRightCharUUID)){
+                        addRightList("rightAlsChar");
+                        rightAlsChar = characteristic;
+                    } else if (deviceUuid.equals(LumosServices.lightIntensityRightCharUUID)){
+                        addRightList("rightLightIntensityChar");
+                        rightLightIntensityChar = characteristic;
+                    } else if (deviceUuid.equals(LumosServices.batteryRightCharUUID)){
+                        addRightList("rightBatteryChar");
+                        rightBatteryChar = characteristic;
+                    } else if (deviceUuid.equals(LumosServices.proxRightCharUUID)){
+                        addRightList("rightProxChar");
+                        rightProxChar = characteristic;
+                    } else if (deviceUuid.equals(LumosServices.calRightCharUUID)){
+                        addRightList("rightCalChar");
+                         rightCalChar= characteristic;
+                    } else if (deviceUuid.equals(LumosServices.cal2RightCharUUID)){
+                        addRightList("rightCal2Char");
+                        rightCal2Char= characteristic;
+                    } else if (deviceUuid.equals(LumosServices.cal3RightCharUUID)){
+                        addRightList("rightCal3Char");
+                        rightCal3Char= characteristic;
                     }else{
                         addRightList(deviceUuid);
                     }
@@ -751,8 +797,6 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            // Stuff that updates the UI
-//                                lcon.setText("connected");
                             connectedUI();
                         }
                     });
@@ -778,9 +822,6 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
 
             if (charsR.size()==0){
 
-                //if(rightPCBConnected){
-                //    RBluetoothGatt.readCharacteristic(RlconnectedChar);
-                //}
             }
         }
 
@@ -789,26 +830,33 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         public void onCharacteristicRead(BluetoothGatt gatt,
                                          BluetoothGattCharacteristic characteristic,
                                          int status) {
-            // Read the characteristic and its value
             if (status == BluetoothGatt.GATT_SUCCESS) {
-
-                Log.d(TAG, "a characteristic has been read" );
-
-                Log.d(TAG, String.valueOf(characteristic.getValue()));
-
                 String deviceUuid = characteristic.getUuid().toString();
-                /*
-                if (deviceUuid.equals(LumosServices.RLconnectedUUID)){
-                    RLCValue = characteristic.getValue();
-                    Log.d(TAG, "RLC has been read on right PCB " + RLCValue[0]);
-                    if (RLCValue[0] == 1){
-                        RLConnectStatus = true;
-                    }else if (RLCValue[0] == 0){
-                        RLConnectStatus = false;
-                    }
-                }
-                */
+                if (deviceUuid.equals(LumosServices.calRightCharUUID)){
 
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            rcal.setText(String.valueOf(ByteBuffer.wrap(characteristic.getValue()).order(ByteOrder.LITTLE_ENDIAN).getInt()));
+                        }
+                    });
+                }else if (deviceUuid.equals(LumosServices.cal2RightCharUUID)){
+                    LEDRValue = characteristic.getValue();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            rcal2.setText(String.valueOf(ByteBuffer.wrap(characteristic.getValue()).order(ByteOrder.LITTLE_ENDIAN).getInt()));
+                        }
+                    });
+                }else if (deviceUuid.equals(LumosServices.cal3RightCharUUID)){
+                    LEDRValue = characteristic.getValue();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            rcal3.setText(String.valueOf(ByteBuffer.wrap(characteristic.getValue()).order(ByteOrder.LITTLE_ENDIAN).getInt()));
+                        }
+                    });
+                }
             }
         }
 
@@ -819,36 +867,15 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
             // Get update for the new value
             Log.w(TAG, "Certain value on the board has changed..." );
             String deviceUuid = characteristic.getUuid().toString();
-            if (deviceUuid.equals(LumosServices.RledCharUUID)){
+            if (deviceUuid.equals(LumosServices.ledRightCharUUID)){
                 LEDRValue = characteristic.getValue();
-                Log.d(TAG, "LED has changed on right PCB " + LEDRValue[0]);
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        //rled.setText(String.valueOf(LEDRValue[0]));
+                        rled.setText(String.valueOf(LEDRValue[0]));
                     }
                 });
-            }else if  (deviceUuid.equals(LumosServices.RbuttonCharUUID)) {
-                buttonRValue = characteristic.getValue();
-                Log.d(TAG, "button has changed on right PCB " + buttonRValue[0]);
-
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        //rbtn.setText(String.valueOf(buttonRValue[0]));
-                    }
-                });
-            }else if  (deviceUuid.equals(LumosServices.RcapCharUUID)) {
-                capRValue = characteristic.getValue();
-                Log.d(TAG, "capsense has changed on right PCB " + capRValue[0]);
-
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        rcap.setText(String.valueOf(capRValue[0]));
-                    }
-                });
-            }else if  (deviceUuid.equals(LumosServices.RalsCharUUID)) {
+            }else if  (deviceUuid.equals(LumosServices.alsRightCharUUID)) {
                 alsRValue = characteristic.getValue();
                 int voltage1 = (int) alsRValue[1];
                 int voltage2 = (int) alsRValue[0];
@@ -862,7 +889,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                         rals.setText(String.valueOf(voltage));
                     }
                 });
-            }else if  (deviceUuid.equals(LumosServices.RbatteryCharUUID)) {
+            }else if  (deviceUuid.equals(LumosServices.batteryRightCharUUID)) {
                 batteryRValue = characteristic.getValue();
                 int voltage1 = (int) batteryRValue[1];
                 int voltage2 = (int) batteryRValue[0];
@@ -876,19 +903,28 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                         rbat.setText(voltage / 33 + "%");
                     }
                 });
+            }else if(deviceUuid.equals(LumosServices.proxRightCharUUID)){
+                byte[] currentvalue = characteristic.getValue();
+                int proxPackage = ((currentvalue[3] & 0xFF) << 24) | ((currentvalue[2] & 0xFF) << 16) | ((currentvalue[1] & 0xFF) << 8) | (currentvalue[0] & 0xFF);
+
+                int proxOpenVolt = proxPackage / 10000;
+                int proxVolt = proxPackage % 10000;
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        rprox.setText(proxVolt + " op:" + proxOpenVolt);
+                    }
+                });
             }
-            /*
-            else if  (deviceUuid.equals(LumosServices.RLconnectedUUID)) {
-                RLCValue = characteristic.getValue();
-                Log.d(TAG, "RLC has been changed on right PCB " + RLCValue[0]);
-                if (RLCValue[0] == 1){
-                    RLConnectStatus = true;
-                }else if (RLCValue[0] == 0){
-                    RLConnectStatus = false;
+
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    RBluetoothGatt.readCharacteristic(rightCalChar);
+                    RBluetoothGatt.readCharacteristic(rightCal2Char);
+                    RBluetoothGatt.readCharacteristic(rightCal3Char);
                 }
-            }
-            */
-            //readChar(characteristic);
+            });
         }
 
     };
@@ -1007,17 +1043,17 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
 
     public void onbutton() {
         // Convert int to UInt8 (8-bit byte)
-        if(lightChar != null && RlightChar != null && ledChar != null &&RledChar != null) {
+        if(leftLightIntensityChar != null && rightLightIntensityChar != null && leftLedChar != null &&rightLedChar != null) {
             // Convert int to UInt8 (8-bit byte), first byte is duty, second is frequency in Hz
             byte[] value = {(byte) (100), (byte) 255};//reverse
             byte[] value2 = {0};
 
             Log.i(TAG, "##############################" + "Switch to Noon mode");
             // Write value to characteristic on the device to change LED brightness
-            lightChar.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
-            lightChar.setValue(value);
+            leftLightIntensityChar.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
+            leftLightIntensityChar.setValue(value);
 
-            if (LBluetoothGatt.writeCharacteristic(lightChar)) {
+            if (LBluetoothGatt.writeCharacteristic(leftLightIntensityChar)) {
                 Log.i(TAG, "##############################" + "lightChar written: 1");
             } else {
                 Log.i(TAG, "##############################" + "lightChar not written");
@@ -1031,10 +1067,10 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
             }
 
             // Write value to characteristic on the right device to change LED brightness
-            RlightChar.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
-            RlightChar.setValue(value);
+            rightLightIntensityChar.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
+            rightLightIntensityChar.setValue(value);
 
-            if (RBluetoothGatt.writeCharacteristic(RlightChar)){
+            if (RBluetoothGatt.writeCharacteristic(rightLightIntensityChar)){
                 Log.i(TAG, "##############################"+"RlightChar written: 0");
             } else {
                 Log.i(TAG, "##############################"+"RlightChar not written");
@@ -1048,10 +1084,10 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
             }
 
             // Write value to characteristic on the device to turn on LED
-            ledChar.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
-            ledChar.setValue(value2);
+            leftLedChar.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
+            leftLedChar.setValue(value2);
 
-            if (LBluetoothGatt.writeCharacteristic(ledChar)){
+            if (LBluetoothGatt.writeCharacteristic(leftLedChar)){
                 Log.i(TAG, "##############################"+"ledChar written: 0");
             } else {
                 Log.i(TAG, "##############################"+"ledChar not written");
@@ -1065,10 +1101,10 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
             }
 
             // Write value to characteristic on the right device to turn off LED
-            RledChar.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
-            RledChar.setValue(value2);
+            rightLedChar.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
+            rightLedChar.setValue(value2);
 
-            if (RBluetoothGatt.writeCharacteristic(RledChar)){
+            if (RBluetoothGatt.writeCharacteristic(rightLedChar)){
                 Log.i(TAG, "##############################"+"RledChar written: 0");
             } else {
                 Log.i(TAG, "##############################"+"RledChar not written");
@@ -1078,17 +1114,17 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     }
 
     public void offbutton() {
-        if(lightChar != null && RlightChar != null && ledChar != null &&RledChar != null) {
+        if(leftLightIntensityChar != null && rightLightIntensityChar != null && leftLedChar!= null &&rightLedChar != null) {
             // Convert int to UInt8 (8-bit byte), first byte is duty, second is frequency in Hz
             byte[] value = {(byte) (100), (byte) 255};//reverse
             byte[] value2 = {1};
 
             Log.i(TAG, "##############################" + "Switch to Noon mode");
             // Write value to characteristic on the device to change LED brightness
-            lightChar.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
-            lightChar.setValue(value);
+            leftLightIntensityChar.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
+            leftLightIntensityChar.setValue(value);
 
-            if (LBluetoothGatt.writeCharacteristic(lightChar)) {
+            if (LBluetoothGatt.writeCharacteristic(leftLightIntensityChar)) {
                 Log.i(TAG, "##############################" + "lightChar written: 1");
             } else {
                 Log.i(TAG, "##############################" + "lightChar not written");
@@ -1102,10 +1138,10 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
             }
 
             // Write value to characteristic on the right device to change LED brightness
-            RlightChar.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
-            RlightChar.setValue(value);
+            rightLightIntensityChar.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
+            rightLightIntensityChar.setValue(value);
 
-            if (RBluetoothGatt.writeCharacteristic(RlightChar)){
+            if (RBluetoothGatt.writeCharacteristic(rightLightIntensityChar)){
                 Log.i(TAG, "##############################"+"RlightChar written: 0");
             } else {
                 Log.i(TAG, "##############################"+"RlightChar not written");
@@ -1119,10 +1155,10 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
             }
 
             // Write value to characteristic on the device to turn on LED
-            ledChar.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
-            ledChar.setValue(value2);
+            leftLedChar.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
+            leftLedChar.setValue(value2);
 
-            if (LBluetoothGatt.writeCharacteristic(ledChar)){
+            if (LBluetoothGatt.writeCharacteristic(leftLedChar)){
                 Log.i(TAG, "##############################"+"ledChar written: 0");
             } else {
                 Log.i(TAG, "##############################"+"ledChar not written");
@@ -1136,10 +1172,10 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
             }
 
             // Write value to characteristic on the right device to turn off LED
-            RledChar.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
-            RledChar.setValue(value2);
+            rightLedChar.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
+            rightLedChar.setValue(value2);
 
-            if (RBluetoothGatt.writeCharacteristic(RledChar)){
+            if (RBluetoothGatt.writeCharacteristic(rightLedChar)){
                 Log.i(TAG, "##############################"+"RledChar written: 0");
             } else {
                 Log.i(TAG, "##############################"+"RledChar not written");
@@ -1148,17 +1184,17 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     }
 
     public void Set_Hz_duty(int duty,int frequency) {
-        if(lightChar != null && RlightChar != null && ledChar != null &&RledChar != null) {
+        if(leftLightIntensityChar != null && rightLightIntensityChar != null && leftLedChar != null &&rightLedChar != null) {
             // Convert int to UInt8 (8-bit byte), first byte is duty, second is frequency in Hz
             byte[] value = {(byte) (duty), (byte) frequency};//reverse
             byte[] value2 = {1};
 
             Log.i(TAG, "##############################" + "Switch to Noon mode");
             // Write value to characteristic on the device to change LED brightness
-            lightChar.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
-            lightChar.setValue(value);
+            leftLightIntensityChar.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
+            leftLightIntensityChar.setValue(value);
 
-            if (LBluetoothGatt.writeCharacteristic(lightChar)) {
+            if (LBluetoothGatt.writeCharacteristic(leftLightIntensityChar)) {
                 Log.i(TAG, "##############################" + "lightChar written: 1");
             } else {
                 Log.i(TAG, "##############################" + "lightChar not written");
@@ -1172,10 +1208,10 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
             }
 
             // Write value to characteristic on the right device to change LED brightness
-            RlightChar.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
-            RlightChar.setValue(value);
+            rightLightIntensityChar.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
+            rightLightIntensityChar.setValue(value);
 
-            if (RBluetoothGatt.writeCharacteristic(RlightChar)){
+            if (RBluetoothGatt.writeCharacteristic(rightLightIntensityChar)){
                 Log.i(TAG, "##############################"+"RlightChar written: 0");
             } else {
                 Log.i(TAG, "##############################"+"RlightChar not written");
@@ -1189,10 +1225,10 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
             }
 
             // Write value to characteristic on the device to turn on LED
-            ledChar.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
-            ledChar.setValue(value2);
+            leftLedChar.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
+            leftLedChar.setValue(value2);
 
-            if (LBluetoothGatt.writeCharacteristic(ledChar)){
+            if (LBluetoothGatt.writeCharacteristic(leftLedChar)){
                 Log.i(TAG, "##############################"+"ledChar written: 0");
             } else {
                 Log.i(TAG, "##############################"+"ledChar not written");
@@ -1206,10 +1242,10 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
             }
 
             // Write value to characteristic on the right device to turn off LED
-            RledChar.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
-            RledChar.setValue(value2);
+            rightLedChar.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
+            rightLedChar.setValue(value2);
 
-            if (RBluetoothGatt.writeCharacteristic(RledChar)){
+            if (RBluetoothGatt.writeCharacteristic(rightLedChar)){
                 Log.i(TAG, "##############################"+"RledChar written: 0");
             } else {
                 Log.i(TAG, "##############################"+"RledChar not written");
@@ -1222,12 +1258,10 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         switch (buttonView.getId()){
             case R.id.power:
                 if(isChecked){
-                    Log.i("felix","switch on");
                     onbutton();
                     Set_Hz_duty(seekbar_intensity.getProgress(),seekbar_frequency.getProgress());
                     on_off = 1;
                 }else{
-                    Log.i("felix","switch off");
                     offbutton();
                     on_off = 0;
                 }
@@ -1245,7 +1279,6 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                 reset();
                 break;
             case R.id.left_arrow_intensity:
-                Log.i("felix","clicked");
                 seekbar_intensity.setProgress(seekbar_intensity.getProgress()-1);
                 break;
             case R.id.right_arrow_intensity:
@@ -1273,27 +1306,32 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     }
 
     private void addLeftList(String item){
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                leftItems.add(item);
-                leftAdaptor.notifyDataSetChanged();
-            }
-        });
+        if(rightItems.size() < 9){
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    leftItems.add(item);
+                    leftAdaptor.notifyDataSetChanged();
+                }
+            });
+        }
+
     }
 
     private void addRightList(String item){
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                rightItems.add(item);
-                rightAdaptor.notifyDataSetChanged();
-            }
-        });
-
+        if(rightItems.size() < 9){
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    rightItems.add(item);
+                    rightAdaptor.notifyDataSetChanged();
+                }
+            });
+        }
     }
 
     private void setLeftState(String text){
+
         runOnUiThread(new Runnable() {
             @Override
             public void run() {

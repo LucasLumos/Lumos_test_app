@@ -24,22 +24,29 @@ public class LumosServices {
     public static String CLIENT_CHARACTERISTIC_CONFIG = "00002902-0000-1000-8000-00805f9b34fb";
 
     // The UUID for a series of characteristics
-    public static String buttonCharUUID = "dc4f88dd-605e-4ac8-8b77-1a661d1e3a6e";
-    public static String capCharUUID = "257ca050-123d-4a7b-9e9b-f4af13cdd209";
-    public static String ledCharUUID = "a7c3dd87-2730-4457-b068-ae2c7517a39c";
-    public static String alsCharUUID = "8ca9a6ee-548c-4aeb-9b01-f4c7aa0b3183";
-    public static String lightCharUUID = "d2a6673c-abc8-41b1-a6b4-dd1bcb6f185d";
-    public static String batteryCharUUID = "d4d5dac2-8e36-497e-877c-82cc32c098b3";
+    // The UUID for a series of characteristics
+    public static final String ledLeftCharUUID = "a7c3dd87-2730-4457-b068-ae2c7517a39c";
+    public static final String alsLeftCharUUID = "8ca9a6ee-548c-4aeb-9b01-f4c7aa0b3183";
+    public static final String lightIntensityLeftCharUUID = "d2a6673c-abc8-41b1-a6b4-dd1bcb6f185d";
+    public static final String batteryLeftCharUUID = "d4d5dac2-8e36-497e-877c-82cc32c098b3";
+    public static final String proxLeftCharUUID = "257ca050-123d-4a7b-9e9b-f4af13cdd209";
+    public static final String pvtLeftCharUUID = "03f2e1d0-cfbe-ad9c-8b7a-6f5e4d3c2b1a";
+    public static final String calLeftCharUUID = "43eda27b-846f-42df-a4f8-34206059b877";
+    public static final String cal2LeftCharUUID = "46eda27b-846f-42df-a4f8-34206059b877";
+    public static final String cal3LeftCharUUID = "d2a6673c-abc8-41b1-a6b4-dd1bcb6f183d";
 
     // The UUID for a series of right pcb characteristics
-    public static String RbuttonCharUUID = "d1799b98-e0da-491e-b6e0-b3557a7b0793";
-    public static String RcapCharUUID = "a9c4734f-e490-4421-8142-daefdf9f0175";
-    public static String RledCharUUID = "162e4caa-1692-402a-8a6c-556c08d6b3a9";
-    public static String RalsCharUUID = "0788570d-0116-4cfc-9342-e5d016cfdb59";
-    public static String RlightCharUUID = "3f5a21ed-83df-4e71-9507-a043114c95db";
-    public static String RbatteryCharUUID = "f38f1739-f2e8-447c-a0fe-72d293cfdbee";
 
-    public static String pvtCharUUID = "03f2e1d0-cfbe-ad9c-8b7a-6f5e4d3c2b1a";
+    public static final String ledRightCharUUID = "162e4caa-1692-402a-8a6c-556c08d6b3a9";
+    public static final String alsRightCharUUID = "0788570d-0116-4cfc-9342-e5d016cfdb59";
+    public static final String lightIntensityRightCharUUID = "3f5a21ed-83df-4e71-9507-a043114c95db";
+    public static final String batteryRightCharUUID = "f38f1739-f2e8-447c-a0fe-72d293cfdbee";
+    public static final String proxRightCharUUID = "a9c4734f-e490-4421-8142-daefdf9f0175";
+    public static final String pvtRightCharUUID = "97b32e48-4293-46a4-881a-61de316889a3";
+    public static final String calRightCharUUID = "90b32e48-4293-46a4-881a-61de316889a3";
+    public static final String cal2RightCharUUID = "93b32e48-4293-46a4-881a-61de316889a3";
+    public static final String cal3RightCharUUID = "13264462-3995-11eb-adc1-0242ac120002";
+    public static final String buttonRightCharUUID = "d1799b98-e0da-491e-b6e0-b3557a7b0793";
 
     public static String RLconnectedUUID = "13264462-3995-11eb-adc1-0242ac120002";
 
