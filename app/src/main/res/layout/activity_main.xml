@@ -687,8 +687,8 @@
                         android:layout_height="wrap_content"
 
                         android:layout_marginTop="12dp"
-                        android:gravity="center"
-                        android:orientation="horizontal"
+                        android:gravity="start"
+                        android:orientation="vertical"
                         app:layout_constraintLeft_toLeftOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/led">
 
@@ -720,8 +720,8 @@
                         android:layout_height="wrap_content"
 
                         android:layout_marginTop="12dp"
-                        android:gravity="center"
-                        android:orientation="horizontal"
+                        android:gravity="start"
+                        android:orientation="vertical"
                         app:layout_constraintLeft_toRightOf="@id/vertical_guideline"
                         app:layout_constraintTop_toBottomOf="@+id/led">
 

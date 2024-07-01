@@ -1046,7 +1046,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         if(leftLightIntensityChar != null && rightLightIntensityChar != null && leftLedChar != null &&rightLedChar != null) {
             // Convert int to UInt8 (8-bit byte), first byte is duty, second is frequency in Hz
             byte[] value = {(byte) (100), (byte) 255};//reverse
-            byte[] value2 = {0};
+            byte[] value2 = {1};
 
             Log.i(TAG, "##############################" + "Switch to Noon mode");
             // Write value to characteristic on the device to change LED brightness
@@ -1115,37 +1115,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
 
     public void offbutton() {
         if(leftLightIntensityChar != null && rightLightIntensityChar != null && leftLedChar!= null &&rightLedChar != null) {
-            // Convert int to UInt8 (8-bit byte), first byte is duty, second is frequency in Hz
-            byte[] value = {(byte) (100), (byte) 255};//reverse
-            byte[] value2 = {1};
-
-            Log.i(TAG, "##############################" + "Switch to Noon mode");
-            // Write value to characteristic on the device to change LED brightness
-            leftLightIntensityChar.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
-            leftLightIntensityChar.setValue(value);
-
-            if (LBluetoothGatt.writeCharacteristic(leftLightIntensityChar)) {
-                Log.i(TAG, "##############################" + "lightChar written: 1");
-            } else {
-                Log.i(TAG, "##############################" + "lightChar not written");
-            }
-
-            // A gap for the previous operation to be finished
-            try {
-                Thread.sleep(150);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-            // Write value to characteristic on the right device to change LED brightness
-            rightLightIntensityChar.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
-            rightLightIntensityChar.setValue(value);
-
-            if (RBluetoothGatt.writeCharacteristic(rightLightIntensityChar)){
-                Log.i(TAG, "##############################"+"RlightChar written: 0");
-            } else {
-                Log.i(TAG, "##############################"+"RlightChar not written");
-            }
+            byte[] value2 = {0};
 
             // A gap for the previous operation to be finished
             try {
