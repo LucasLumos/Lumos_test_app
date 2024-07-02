@@ -50,7 +50,7 @@
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@id/light_exposure_text_title"
-            android:layout_marginBottom="30dp"
+            android:layout_marginBottom="50dp"
             app:layout_constraintWidth_percent="0.8293">
 
             <LinearLayout
@@ -990,7 +990,128 @@
                         app:layout_constraintTop_toBottomOf="@id/pvtbtn"
                         app:layout_constraintWidth_percent="0.4" />
 
+                    <EditText
+                        android:id="@+id/cal_text_input"
+                        android:layout_width="0px"
+                        android:layout_height="0px"
+                        app:layout_constraintDimensionRatio="h,2:1.2"
+                        app:layout_constraintWidth_percent="0.2"
+                        android:layout_centerInParent="true"
+                        android:layout_marginTop="15dp"
+                        android:hint="Cal"
+                        android:inputType="number"
+                        app:layout_constraintTop_toBottomOf="@id/reset_btn"
+                        app:layout_constraintRight_toLeftOf="@id/set_cal_btn"
+                        android:background="@drawable/input"
+                        android:paddingHorizontal="9dp"
+                        android:layout_marginRight="40dp"
+                        />
 
+                    <Button
+                        android:id="@+id/set_cal_btn"
+                        android:layout_width="0px"
+                        android:layout_height="0px"
+                        android:layout_marginTop="15dp"
+                        android:layout_marginRight="10dp"
+
+                        android:background="@drawable/lightgreen_btn_style"
+                        android:fontFamily="@font/maven_pro_black"
+                        android:text="Set cal"
+                        android:textAllCaps="false"
+                        android:textColor="@color/btn_textcolor_switcher"
+                        android:textSize="14dp"
+                        app:layout_constraintDimensionRatio="h,263:80"
+                        app:layout_constraintTop_toBottomOf="@id/reset_btn"
+                        app:layout_constraintRight_toRightOf="parent"
+                        app:layout_constraintWidth_percent="0.4" />
+
+                    <Button
+                        android:id="@+id/set_cal2_btn"
+                        android:layout_width="0px"
+                        android:layout_height="0px"
+                        android:layout_marginTop="15dp"
+                        android:layout_marginRight="10dp"
+
+                        android:background="@drawable/lightgreen_btn_style"
+                        android:fontFamily="@font/maven_pro_black"
+                        android:text="Set cal2"
+                        android:textAllCaps="false"
+                        android:textColor="@color/btn_textcolor_switcher"
+                        android:textSize="14dp"
+                        app:layout_constraintDimensionRatio="h,263:80"
+                        app:layout_constraintTop_toBottomOf="@id/cal_text_input"
+                        app:layout_constraintRight_toRightOf="parent"
+                        app:layout_constraintWidth_percent="0.4" />
+
+                    <EditText
+                        android:id="@+id/cal2_text_input"
+                        android:layout_width="0px"
+                        android:layout_height="0px"
+                        app:layout_constraintDimensionRatio="h,2:1.2"
+                        app:layout_constraintWidth_percent="0.2"
+                        android:layout_centerInParent="true"
+                        android:layout_marginTop="15dp"
+                        android:hint="Cal2"
+                        android:inputType="number"
+                        app:layout_constraintTop_toBottomOf="@id/cal_text_input"
+                        app:layout_constraintRight_toLeftOf="@id/set_cal_btn"
+                        android:background="@drawable/input"
+                        android:paddingHorizontal="9dp"
+                        android:layout_marginRight="40dp"/>
+
+
+
+                    <Button
+                        android:id="@+id/set_cal3_btn"
+                        android:layout_width="0px"
+                        android:layout_height="0px"
+                        android:layout_marginTop="15dp"
+                        android:layout_marginRight="10dp"
+
+                        android:background="@drawable/lightgreen_btn_style"
+                        android:fontFamily="@font/maven_pro_black"
+                        android:text="Set cal3"
+                        android:textAllCaps="false"
+                        android:textColor="@color/btn_textcolor_switcher"
+                        android:textSize="14dp"
+                        app:layout_constraintDimensionRatio="h,263:80"
+                        app:layout_constraintTop_toBottomOf="@id/cal2_text_input"
+                        app:layout_constraintRight_toRightOf="parent"
+                        app:layout_constraintWidth_percent="0.4" />
+
+                    <EditText
+                        android:id="@+id/cal3_text_input"
+                        android:layout_width="0px"
+                        android:layout_height="0px"
+                        app:layout_constraintDimensionRatio="h,2:1.2"
+                        app:layout_constraintWidth_percent="0.2"
+                        android:layout_centerInParent="true"
+                        android:layout_marginTop="15dp"
+                        android:hint="Cal3"
+                        android:inputType="number"
+                        app:layout_constraintTop_toBottomOf="@id/cal2_text_input"
+                        app:layout_constraintRight_toLeftOf="@id/set_cal_btn"
+                        android:background="@drawable/input"
+                        android:paddingHorizontal="9dp"
+                        android:layout_marginRight="40dp"/>
+
+                    <Button
+                        android:id="@+id/read_cal_btn"
+                        android:layout_width="0px"
+                        android:layout_height="0px"
+                        android:layout_marginTop="15dp"
+                        android:layout_marginRight="10dp"
+
+                        android:background="@drawable/lightgreen_btn_style"
+                        android:fontFamily="@font/maven_pro_black"
+                        android:text="read all cal value"
+                        android:textAllCaps="false"
+                        android:textColor="@color/btn_textcolor_switcher"
+                        android:textSize="14dp"
+                        app:layout_constraintDimensionRatio="h,263:40"
+                        app:layout_constraintTop_toBottomOf="@id/cal3_text_input"
+                        app:layout_constraintRight_toRightOf="parent"
+                        app:layout_constraintWidth_percent="0.8" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
 

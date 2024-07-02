@@ -29,6 +29,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.SeekBar;
@@ -132,6 +133,10 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     private TextView lcal3,rcal3;
     private TextView lled,rled;
 
+    private Button read_cal_value_btn;
+    private EditText cal_input,cal2_input,cal3_input;
+    private Button set_cal_btn, set_cal2_btn, set_cal3_btn;
+
     private Switch light_switch;
     private SeekBar seekbar_intensity, seekbar_frequency;
     private Button reset_btn;
@@ -146,6 +151,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
 
     private ArrayAdapter<String> leftAdaptor;
     private ArrayAdapter<String> rightAdaptor;
+
 
     private byte[] LEDLValue;
     private byte[] buttonLValue;
@@ -195,12 +201,26 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         leftState = findViewById(R.id.light_exposure_status_left_state );
         rightState = findViewById(R.id.light_exposure_status_right_state );
 
+        cal_input = (EditText) findViewById(R.id.cal_text_input);
+        cal2_input = (EditText) findViewById(R.id.cal2_text_input);
+        cal3_input = (EditText) findViewById(R.id.cal3_text_input);
+
 
         intensity_right = findViewById(R.id.right_arrow_intensity);
         intensity_left= findViewById(R.id.left_arrow_intensity);
         frequency_right= findViewById(R.id.right_arrow_frequency);
         frequency_left= findViewById(R.id.left_arrow_frequency);
         pvtBtn = findViewById(R.id.pvtbtn);
+
+        set_cal_btn = (Button) findViewById(R.id.set_cal_btn);
+        set_cal2_btn = (Button) findViewById(R.id.set_cal2_btn);
+        set_cal3_btn = (Button) findViewById(R.id.set_cal3_btn);
+        read_cal_value_btn = (Button) findViewById(R.id.read_cal_btn);
+
+        read_cal_value_btn.setOnClickListener(this);
+        set_cal_btn.setOnClickListener(this);
+        set_cal2_btn.setOnClickListener(this);
+        set_cal3_btn.setOnClickListener(this);
         intensity_right.setOnClickListener(this);
         intensity_left.setOnClickListener(this);
         frequency_right.setOnClickListener(this);
@@ -692,15 +712,6 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                     }
                 });
             }
-
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    LBluetoothGatt.readCharacteristic(leftCalChar);
-                    LBluetoothGatt.readCharacteristic(leftCal2Char);
-                    LBluetoothGatt.readCharacteristic(leftCal3Char);
-                }
-            });
         }
     };
 
@@ -841,6 +852,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                         }
                     });
                 }else if (deviceUuid.equals(LumosServices.cal2RightCharUUID)){
+                    Log.i("felix","read cal2 calue" + ByteBuffer.wrap(characteristic.getValue()).order(ByteOrder.LITTLE_ENDIAN).getInt());
                     LEDRValue = characteristic.getValue();
                     runOnUiThread(new Runnable() {
                         @Override
@@ -916,15 +928,6 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                     }
                 });
             }
-
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    RBluetoothGatt.readCharacteristic(rightCalChar);
-                    RBluetoothGatt.readCharacteristic(rightCal2Char);
-                    RBluetoothGatt.readCharacteristic(rightCal3Char);
-                }
-            });
         }
 
     };
@@ -1270,8 +1273,104 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                     startActivity(intent);
                 }
                 break;
+
+            case R.id.set_cal_btn:
+                set_cal_value();
+                break;
+            case R.id.set_cal2_btn:
+                set_cal2_value();
+                break;
+            case R.id.set_cal3_btn:
+                set_cal3_value();
+                break;
+            case R.id.read_cal_btn:
+                read_all_cal();
+                break;
             default:
                 break;
+        }
+    }
+
+    private void read_all_cal() {
+        if(LBluetoothGatt != null){
+            while(!LBluetoothGatt.readCharacteristic(leftCalChar));
+            while(!LBluetoothGatt.readCharacteristic(leftCal2Char));
+            while(!LBluetoothGatt.readCharacteristic(leftCal3Char));
+        }
+
+        if(RBluetoothGatt != null){
+            while(!RBluetoothGatt.readCharacteristic(rightCalChar));
+            while(!RBluetoothGatt.readCharacteristic(rightCal2Char));
+            while(!RBluetoothGatt.readCharacteristic(rightCal3Char));
+        }
+    }
+
+    private void set_cal3_value() {
+        String text_value = cal3_input.getText().toString();
+        try {
+            int value = Integer.parseInt(text_value);
+            ByteBuffer buffer = ByteBuffer.allocate(4);
+            buffer.order(ByteOrder.LITTLE_ENDIAN); // Set byte order to little endian
+            buffer.putInt(value);
+            byte[] byteArray = buffer.array();
+            if(leftCal3Char!= null){
+                leftCal3Char.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
+                leftCal3Char.setValue(byteArray);
+                while(!LBluetoothGatt.writeCharacteristic(leftCal3Char)){}
+            }
+            if(rightCal3Char!= null){
+                rightCal3Char.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
+                rightCal3Char.setValue(byteArray);
+                while(!RBluetoothGatt.writeCharacteristic(rightCal3Char)){}
+            }
+        }catch (NumberFormatException e){
+            return;
+        }
+    }
+
+    private void set_cal2_value() {
+        String text_value = cal2_input.getText().toString();
+        try {
+            int value = Integer.parseInt(text_value);
+            ByteBuffer buffer = ByteBuffer.allocate(4);
+            buffer.order(ByteOrder.LITTLE_ENDIAN); // Set byte order to little endian
+            buffer.putInt(value);
+            byte[] byteArray = buffer.array();
+            if(leftCal2Char!= null){
+                leftCal2Char.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
+                leftCal2Char.setValue(byteArray);
+                while(!LBluetoothGatt.writeCharacteristic(leftCal2Char)){}
+            }
+            if(rightCal2Char!= null){
+                rightCal2Char.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
+                rightCal2Char.setValue(byteArray);
+                while(!RBluetoothGatt.writeCharacteristic(rightCal2Char)){}
+            }
+        }catch (NumberFormatException e){
+            return;
+        }
+    }
+
+    private void set_cal_value() {
+        String text_value = cal_input.getText().toString();
+        try {
+            int value = Integer.parseInt(text_value);
+            ByteBuffer buffer = ByteBuffer.allocate(4);
+            buffer.order(ByteOrder.LITTLE_ENDIAN); // Set byte order to little endian
+            buffer.putInt(value);
+            byte[] byteArray = buffer.array();
+            if(leftCalChar!= null){
+                leftCalChar.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
+                leftCalChar.setValue(byteArray);
+                while(!LBluetoothGatt.writeCharacteristic(leftCalChar)){}
+            }
+            if(rightCalChar!= null){
+                rightCalChar.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
+                rightCalChar.setValue(byteArray);
+                while(!RBluetoothGatt.writeCharacteristic(rightCalChar)){}
+            }
+        }catch (NumberFormatException e){
+            return;
         }
     }
 
